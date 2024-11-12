@@ -1,3 +1,6 @@
+
+
+
 // src/data/item.js
 
 // Dữ liệu mẫu cho các sản phẩm
@@ -368,7 +371,256 @@ export const items = [
       status: 'Còn hàng',
       additionalInfo: 'Bao gồm các công cụ chính xác, hướng dẫn sử dụng chi tiết.'
     },
+
+
+    // Trang 4
+    {
+      id: 31,
+      name: 'Đồng Hồ Apple Watch Ultra',
+      description: 'Phiên bản cao cấp của Apple Watch với nhiều tính năng sức khỏe và thể thao.',
+      price: 22_000_000, // 22,000,000đ
+      category: 'Đồng hồ thông minh',
+      stock: 10,
+      image: 'https://example.com/images/product31.jpg',
+      productCode: 'AWULTRA-001',
+      status: 'Còn hàng',
+      additionalInfo: 'Chống nước lên đến 100m, bảo hành chính hãng 12 tháng.'
+    },
+    {
+      id: 32,
+      name: 'Phụ Kiện Cáp Sạc Nhanh Apple Watch',
+      description: 'Cáp sạc nhanh cho Apple Watch, hỗ trợ sạc nhanh và tiện dụng.',
+      price: 600_000, // 600,000đ
+      category: 'Phụ kiện',
+      stock: 25,
+      image: 'https://example.com/images/product32.jpg',
+      productCode: 'PKCSAW-001',
+      status: 'Còn hàng',
+      additionalInfo: 'Dây sạc chính hãng, tương thích với tất cả các phiên bản Apple Watch.'
+    },
+    {
+      id: 33,
+      name: 'Đồng Hồ Casio Edifice EFR-539',
+      description: 'Đồng hồ nam với thiết kế mạnh mẽ, nhiều tính năng tiện ích.',
+      price: 4_200_000, // 4,200,000đ
+      category: 'Đồng hồ thời trang',
+      stock: 14,
+      image: 'https://example.com/images/product33.jpg',
+      productCode: 'CASIOEFR539',
+      status: 'Còn hàng',
+      additionalInfo: 'Thiết kế chống nước, bảo hành 12 tháng.'
+    },
+    {
+      id: 34,
+      name: 'Phụ Kiện Miếng Dán Bảo Vệ Màn Hình Apple Watch',
+      description: 'Miếng dán cường lực bảo vệ màn hình Apple Watch, chống trầy xước.',
+      price: 200_000, // 200,000đ
+      category: 'Phụ kiện',
+      stock: 40,
+      image: 'https://example.com/images/product34.jpg',
+      productCode: 'PKMDBVMAW',
+      status: 'Còn hàng',
+      additionalInfo: 'Dễ dàng lắp đặt, không ảnh hưởng đến chất lượng hình ảnh.'
+    },
+    {
+      id: 35,
+      name: 'Đồng Hồ Orient Bambino Version 5',
+      description: 'Đồng hồ cơ tự động với thiết kế cổ điển và tinh tế.',
+      price: 5_000_000, // 5,000,000đ
+      category: 'Đồng hồ thời trang',
+      stock: 8,
+      image: 'https://example.com/images/product35.jpg',
+      productCode: 'ORIENTBV5',
+      status: 'Còn hàng',
+      additionalInfo: 'Bảo hành chính hãng 24 tháng.'
+    },
+    {
+      id: 36,
+      name: 'Phụ Kiện Bộ Vít Thay Dây Đồng Hồ',
+      description: 'Bộ dụng cụ chuyên dụng để thay dây đồng hồ dễ dàng.',
+      price: 300_000, // 300,000đ
+      category: 'Phụ kiện',
+      stock: 50,
+      image: 'https://example.com/images/product36.jpg',
+      productCode: 'PKBVTDH',
+      status: 'Còn hàng',
+      additionalInfo: 'Bao gồm nhiều đầu vít, phù hợp với hầu hết các loại đồng hồ.'
+    },
+    {
+      id: 37,
+      name: 'Đồng Hồ Fossil Chronograph',
+      description: 'Đồng hồ Chronograph với thiết kế thể thao, hiện đại.',
+      price: 3_200_000, // 3,200,000đ
+      category: 'Đồng hồ thời trang',
+      stock: 12,
+      image: 'https://example.com/images/product37.jpg',
+      productCode: 'FOSSCRO',
+      status: 'Còn hàng',
+      additionalInfo: 'Bảo hành chính hãng 12 tháng.'
+    },
+    {
+      id: 38,
+      name: 'Phụ Kiện Dây Vải NATO Cho Đồng Hồ',
+      description: 'Dây vải NATO chắc chắn, nhiều màu sắc và kích cỡ.',
+      price: 400_000, // 400,000đ
+      category: 'Phụ kiện',
+      stock: 35,
+      image: 'https://example.com/images/product38.jpg',
+      productCode: 'PKDVNATO',
+      status: 'Còn hàng',
+      additionalInfo: 'Dễ dàng thay đổi, phù hợp với nhiều loại đồng hồ.'
+    },
+    {
+      id: 39,
+      name: 'Đồng Hồ Seiko 5 Sports',
+      description: 'Đồng hồ thể thao năng động với cơ chế tự động.',
+      price: 6_000_000, // 6,000,000đ
+      category: 'Đồng hồ thể thao',
+      stock: 20,
+      image: 'https://example.com/images/product39.jpg',
+      productCode: 'SEIKO5S',
+      status: 'Còn hàng',
+      additionalInfo: 'Chống nước 100m, bảo hành 24 tháng.'
+    },
+    {
+      id: 40,
+      name: 'Phụ Kiện Đế Sạc Cho Samsung Galaxy Watch',
+      description: 'Đế sạc tiện lợi cho Samsung Galaxy Watch với thiết kế nhỏ gọn.',
+      price: 500_000, // 500,000đ
+      category: 'Phụ kiện',
+      stock: 30,
+      image: 'https://example.com/images/product40.jpg',
+      productCode: 'PKDSGW',
+      status: 'Còn hàng',
+      additionalInfo: 'Hỗ trợ sạc nhanh, tiện dụng khi di chuyển.'
+    },
+    {
+      id: 41,
+      name: 'Đồng Hồ Citizen Eco-Drive Titanium',
+      description: 'Đồng hồ bền bỉ với năng lượng mặt trời và chất liệu Titanium.',
+      price: 12_000_000, // 12,000,000đ
+      category: 'Đồng hồ cao cấp',
+      stock: 5,
+      image: 'https://example.com/images/product41.jpg',
+      productCode: 'CITECO-TI',
+      status: 'Còn hàng',
+      additionalInfo: 'Chống nước 100m, bảo hành chính hãng 5 năm.'
+    },
+    {
+      id: 42,
+      name: 'Phụ Kiện Khóa Đồng Hồ Thép Không Gỉ',
+      description: 'Khóa đồng hồ bằng thép không gỉ, phù hợp với nhiều loại dây.',
+      price: 250_000, // 250,000đ
+      category: 'Phụ kiện',
+      stock: 45,
+      image: 'https://example.com/images/product42.jpg',
+      productCode: 'PKKHSP',
+      status: 'Còn hàng',
+      additionalInfo: 'Thiết kế bền đẹp, dễ dàng sử dụng.'
+    },
+    {
+      id: 43,
+      name: 'Đồng Hồ Michael Kors Bradshaw',
+      description: 'Đồng hồ thời trang với phong cách sang trọng và hiện đại.',
+      price: 4_500_000, // 4,500,000đ
+      category: 'Đồng hồ thời trang',
+      stock: 9,
+      image: 'https://example.com/images/product43.jpg',
+      productCode: 'MKBRADSHAW',
+      status: 'Còn hàng',
+      additionalInfo: 'Chất liệu thép không gỉ, bảo hành 12 tháng.'
+    },
+    {
+      id: 44,
+      name: 'Phụ Kiện Miếng Dán Màn Hình Cho Đồng Hồ Garmin',
+      description: 'Miếng dán bảo vệ màn hình cho các loại đồng hồ Garmin.',
+      price: 300_000, // 300,000đ
+      category: 'Phụ kiện',
+      stock: 30,
+      image: 'https://example.com/images/product44.jpg',
+      productCode: 'PKMDG',
+      status: 'Còn hàng',
+      additionalInfo: 'Dễ dàng lắp đặt, không ảnh hưởng đến màn hình.'
+    },
+    {
+      id: 45,
+      name: 'Đồng Hồ Casio G-Shock GBA-800',
+      description: 'Đồng hồ thể thao chống sốc, hỗ trợ Bluetooth và nhiều tính năng tiện ích.',
+      price: 3_800_000, // 3,800,000đ
+      category: 'Đồng hồ thể thao',
+      stock: 15,
+      image: 'https://example.com/images/product45.jpg',
+      productCode: 'GSHOCK800',
+      status: 'Còn hàng',
+      additionalInfo: 'Bảo hành chính hãng 24 tháng.'
+    },
+    {
+      id: 46,
+      name: 'Phụ Kiện Chân Đế Đồng Hồ Để Bàn',
+      description: 'Chân đế đồng hồ để bàn bằng gỗ sang trọng.',
+      price: 1_000_000, // 1,000,000đ
+      category: 'Phụ kiện',
+      stock: 12,
+      image: 'https://example.com/images/product46.jpg',
+      productCode: 'PKCDB',
+      status: 'Còn hàng',
+      additionalInfo: 'Chất liệu gỗ tự nhiên, thiết kế sang trọng.'
+    },
+    {
+      id: 47,
+      name: 'Đồng Hồ Orient Star Skeleton',
+      description: 'Đồng hồ cơ với thiết kế lộ máy tinh xảo.',
+      price: 13_500_000, // 13,500,000đ
+      category: 'Đồng hồ cao cấp',
+      stock: 5,
+      image: 'https://example.com/images/product47.jpg',
+      productCode: 'ORSKEL',
+      status: 'Còn hàng',
+      additionalInfo: 'Bảo hành chính hãng 5 năm.'
+    },
+    {
+      id: 48,
+      name: 'Phụ Kiện Giá Treo Đồng Hồ',
+      description: 'Giá treo đồng hồ bằng thép không gỉ, bảo quản đồng hồ dễ dàng.',
+      price: 1_200_000, // 1,200,000đ
+      category: 'Phụ kiện',
+      stock: 10,
+      image: 'https://example.com/images/product48.jpg',
+      productCode: 'PKGT-001',
+      status: 'Còn hàng',
+      additionalInfo: 'Thiết kế tiện lợi, dễ lắp đặt.'
+    },
+    {
+      id: 49,
+      name: 'Đồng Hồ Frederique Constant Slimline',
+      description: 'Đồng hồ với thiết kế mỏng nhẹ, sang trọng.',
+      price: 21_000_000, // 21,000,000đ
+      category: 'Đồng hồ cao cấp',
+      stock: 6,
+      image: 'https://example.com/images/product49.jpg',
+      productCode: 'FC-SLIM',
+      status: 'Còn hàng',
+      additionalInfo: 'Bảo hành chính hãng 5 năm.'
+    },
+    {
+      id: 50,
+      name: 'Phụ Kiện Hộp Đựng Đồng Hồ 4 Ngăn',
+      description: 'Hộp đựng đồng hồ cao cấp với 4 ngăn, phù hợp để lưu trữ đồng hồ.',
+      price: 1_800_000, // 1,800,000đ
+      category: 'Phụ kiện',
+      stock: 18,
+      image: 'https://example.com/images/product50.jpg',
+      productCode: 'PKHD4N',
+      status: 'Còn hàng',
+      additionalInfo: 'Thiết kế sang trọng, bảo vệ đồng hồ tốt.'
+    },
+
+
+
+
   ];
+
+  
   
 // Hàm lấy sản phẩm theo ID
 export function getItemById(id) {

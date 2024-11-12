@@ -1,39 +1,62 @@
 <template>
   <div class="home-page">
-    <h1>Chào mừng đến với cửa hàng HTN HAO</h1>
+    <!-- Carousel Banner Section -->
+    <section class="home-page__carousel-section">
+      <CarouselBanner @navigate="handleNavigate" />
+    </section>
 
     <!-- Phần sản phẩm nổi bật -->
-    <section class="featured-products">
-      <h2>Sản phẩm nổi bật</h2>
-      <div class="product-list">
+    <section class="home-page__featured-products">
+      <h2 class="home-page__section-title">Sản phẩm nổi bật</h2>
+      <div class="home-page__product-list">
         <ProductCard
           v-for="product in featuredProducts"
           :key="product.id"
           :product="product"
+          @add-to-cart="addToCart"
         />
       </div>
     </section>
 
     <!-- Tất cả sản phẩm với điều khiển phân trang -->
-    <section class="all-products">
-      <h2>Tất cả sản phẩm</h2>
-      <div class="product-list">
+    <section class="home-page__all-products">
+      <h2 class="home-page__section-title">Tất cả sản phẩm</h2>
+      <div class="home-page__product-list">
         <ProductCard
           v-for="product in paginatedProducts"
           :key="product.id"
           :product="product"
+          @add-to-cart="addToCart"
         />
       </div>
 
       <!-- Điều khiển phân trang -->
-      <div class="pagination">
+      <div class="home-page__pagination" aria-label="Phân trang">
+        <button
+          :disabled="currentPage === 1"
+          @click="changePage(currentPage - 1)"
+          class="pagination-button"
+          aria-label="Trang trước"
+        >
+          &laquo;
+        </button>
         <button
           v-for="page in totalPages"
           :key="page"
           @click="changePage(page)"
-          :class="{ active: currentPage === page }"
+          :class="{ 'pagination-button--active': currentPage === page }"
+          class="pagination-button"
+          :aria-current="currentPage === page ? 'page' : false"
         >
           {{ page }}
+        </button>
+        <button
+          :disabled="currentPage === totalPages"
+          @click="changePage(currentPage + 1)"
+          class="pagination-button"
+          aria-label="Trang sau"
+        >
+          &raquo;
         </button>
       </div>
     </section>
@@ -42,25 +65,24 @@
 
 <script>
 import ProductCard from "../components/product/ProductCard.vue";
+import CarouselBanner from "../components/CarouselBanner.vue";
 import { items } from "../data/item.js";
 
 export default {
   name: "HomePage",
-  components: { ProductCard },
+  components: { ProductCard, CarouselBanner },
   data() {
     return {
-      featuredProducts: items.slice(0, 5), // Hiển thị 4 sản phẩm nổi bật đầu tiên
-      products: items.slice(4), // Các sản phẩm còn lại để phân trang
+      featuredProducts: [],
+      products: [],
       currentPage: 1,
-      itemsPerPage: 10, // Số sản phẩm trên mỗi trang
+      itemsPerPage: 8,
     };
   },
   computed: {
-    // Tổng số trang dựa vào số sản phẩm và số sản phẩm trên mỗi trang
     totalPages() {
       return Math.ceil(this.products.length / this.itemsPerPage);
     },
-    // Tính toán các sản phẩm hiển thị trên trang hiện tại
     paginatedProducts() {
       const start = (this.currentPage - 1) * this.itemsPerPage;
       const end = start + this.itemsPerPage;
@@ -68,90 +90,141 @@ export default {
     },
   },
   methods: {
-    // Phương thức thay đổi trang khi người dùng bấm nút phân trang
     changePage(page) {
-      this.currentPage = page;
-      window.scrollTo(0, 0); // Cuộn về đầu trang khi chuyển trang
+      if (page >= 1 && page <= this.totalPages) {
+        this.currentPage = page;
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     },
+    addToCart(product) {
+      this.$emit("add-to-cart", product);
+      // Bạn có thể thêm logic thêm sản phẩm vào giỏ hàng tại đây hoặc xử lý trong component cha
+    },
+    handleNavigate(route) {
+      // Giả sử bạn đang sử dụng Vue Router để điều hướng
+      this.$router.push({ name: route });
+      // Nếu không sử dụng Vue Router, bạn có thể xử lý theo cách khác
+    },
+    formatPrice(price) {
+      return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+    },
+  },
+  created() {
+    // Khởi tạo sản phẩm nổi bật và tất cả sản phẩm
+    this.featuredProducts = items.slice(0, 4);
+    this.products = items.slice(4);
   },
 };
 </script>
 
 <style scoped>
+/* CSS Variables for Consistent Styling */
+:root {
+  --primary-color: #003366;
+  --secondary-color: #ffcc00;
+  --hover-color: #ffd54f;
+  --text-color: #333333;
+  --background-color: #f4f6f9;
+  --font-family: 'Roboto', sans-serif;
+  --transition-speed: 0.3s;
+}
+
+/* Container Styling */
 .home-page {
-  padding: 20px;
-  text-align: center;
-  font-family: 'Roboto', sans-serif;
-  background-color: #f4f6f9;
-  margin-top: 60px;
+  font-family: var(--font-family);
+  background-color: var(--background-color);
+  padding: 20px 0;
 }
 
-h1 {
-  font-size: 2rem;
-  color: #2c3e50;
-  margin-bottom: 20px;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-/* Phần sản phẩm nổi bật */
-.featured-products, .all-products {
+/* Carousel Banner Styling */
+.home-page__carousel-section {
   margin-bottom: 40px;
 }
 
-.featured-products h2, .all-products h2 {
-  font-size: 1.5rem;
-  color: #2c3e50;
+/* Section Styling */
+.home-page__featured-products,
+.home-page__all-products {
+  margin: 40px 0;
+  text-align: center;
+}
+
+.home-page__section-title {
+  font-size: 2rem;
+  color: var(--primary-color);
   margin-bottom: 20px;
   font-weight: 700;
 }
 
-.product-list {
+/* Product List */
+.home-page__product-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 20px;
-  padding: 10px;
+  padding: 0 20px;
   max-width: 1200px;
   margin: 0 auto;
 }
 
-/* Phân trang */
-.pagination {
+/* Pagination Styling */
+.home-page__pagination {
   display: flex;
   justify-content: center;
   margin-top: 20px;
   gap: 8px;
 }
 
-.pagination button {
+.pagination-button {
   padding: 8px 12px;
   font-size: 1rem;
-  color: #2c3e50;
+  color: var(--primary-color);
   background-color: #e0e0e0;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color var(--transition-speed), color var(--transition-speed);
 }
 
-.pagination button.active {
-  background-color: #2a9d8f;
+.pagination-button--active {
+  background-color: var(--primary-color);
   color: white;
   font-weight: bold;
 }
 
-.pagination button:hover {
-  background-color: #d3d3d3;
+.pagination-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }
 
-/* Responsive design cho các màn hình nhỏ */
+.pagination-button:hover:not(:disabled),
+.pagination-button:focus:not(:disabled) {
+  background-color: #d3d3d3;
+  outline: none;
+}
+
+/* Responsive Design for Smaller Screens */
 @media (max-width: 768px) {
-  .product-list {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  .home-page__product-list {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
   }
 
-  h1 {
+  .home-page__section-title {
     font-size: 1.5rem;
+  }
+
+  .pagination-button {
+    padding: 6px 10px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .home-page__section-title {
+    font-size: 1.3rem;
+  }
+
+  .pagination-button {
+    padding: 5px 8px;
+    font-size: 0.8rem;
   }
 }
 </style>

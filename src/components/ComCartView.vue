@@ -1,101 +1,180 @@
 <template>
   <div class="cart-view">
-    <h2>Giỏ Hàng</h2>
-    <ul class="cart-list">
-      <li v-for="item in cart" :key="item.id" class="cart-item">
-        <span class="item-name">{{ item.name }} (x{{ item.quantity }})</span>
-        <button @click="$emit('remove-item', item)" class="remove-button">Xóa</button>
-      </li>
-    </ul>
-    <button @click="$emit('clear-cart')" class="clear-cart-button">Xóa toàn bộ giỏ hàng</button>
+    <div class="cart-view__header">
+      <h2>Giỏ hàng</h2>
+      <button @click="$emit('close-cart')" class="cart-view__close-button" aria-label="Đóng giỏ hàng">✖️</button>
+    </div>
+    <div v-if="cart.length > 0" class="cart-view__items">
+      <div v-for="item in cart" :key="item.id" class="cart-view__item">
+        <img :src="item.image" :alt="item.name" class="cart-view__item-image" />
+        <div class="cart-view__item-details">
+          <h3 class="cart-view__item-name">{{ item.name }}</h3>
+          <p class="cart-view__item-price">Giá: {{ formatPrice(item.price) }}</p>
+          <p class="cart-view__item-quantity">Số lượng: {{ item.quantity }}</p>
+          <button @click="$emit('remove-item', item)" class="cart-view__remove-button">Xóa</button>
+        </div>
+      </div>
+      <div class="cart-view__total">
+        <h3>Tổng cộng: {{ formatPrice(totalPrice) }}</h3>
+      </div>
+      <div class="cart-view__actions">
+        <button @click="$emit('clear-cart')" class="cart-view__clear-button">Xóa toàn bộ</button>
+        <button @click="checkout" class="cart-view__checkout-button">Thanh toán</button>
+      </div>
+    </div>
+    <div v-else class="cart-view__empty">
+      <p>Giỏ hàng của bạn đang trống.</p>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'ComCartView',
+  name: "ComCartView",
   props: {
     cart: {
       type: Array,
-      required: true
-    }
-  }
-}
+      required: true,
+    },
+  },
+  computed: {
+    totalPrice() {
+      return this.cart.reduce((total, item) => total + item.price * item.quantity, 0);
+    },
+  },
+  methods: {
+    formatPrice(price) {
+      return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
+    },
+    checkout() {
+      // Logic thanh toán, ví dụ điều hướng tới trang thanh toán
+      this.$emit('close-cart');
+      this.$emit('navigate', 'checkout');
+    },
+  },
+};
 </script>
 
 <style scoped>
-/* Container cho giỏ hàng */
 .cart-view {
-  background-color: #ecf0f1;
-  padding: 20px;
-  border: 1px solid #bdc3c7;
-  border-radius: 8px;
-  max-width: 400px;
-  margin: 20px auto;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-/* Tiêu đề */
-.cart-view h2 {
-  font-size: 1.5rem;
-  color: #2c3e50;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-/* Danh sách sản phẩm trong giỏ hàng */
-.cart-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-/* Sản phẩm trong giỏ hàng */
-.cart-item {
+.cart-view__header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.cart-view__close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: var(--primary-color);
+  transition: color var(--transition-speed);
+}
+
+.cart-view__close-button:hover,
+.cart-view__close-button:focus {
+  color: var(--secondary-color);
+  outline: none;
+}
+
+.cart-view__items {
+  flex: 1;
+  overflow-y: auto;
   padding: 10px 0;
-  border-bottom: 1px solid #bdc3c7;
 }
 
-.item-name {
-  font-size: 1rem;
-  color: #34495e;
+.cart-view__item {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
 }
 
-/* Nút xóa sản phẩm */
-.remove-button {
-  background-color: #e74c3c;
-  color: white;
+.cart-view__item-image {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.cart-view__item-details {
+  flex: 1;
+}
+
+.cart-view__item-name {
+  font-size: 16px;
+  margin-bottom: 5px;
+  color: var(--primary-color);
+}
+
+.cart-view__item-price,
+.cart-view__item-quantity {
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.cart-view__remove-button {
+  background-color: #ff5722;
+  color: #ffffff;
   border: none;
-  border-radius: 5px;
   padding: 5px 10px;
+  border-radius: 4px;
   cursor: pointer;
-  font-size: 0.875rem;
-  transition: background-color 0.3s ease;
+  font-size: 14px;
+  transition: background-color var(--transition-speed);
 }
 
-.remove-button:hover {
-  background-color: #c0392b;
+.cart-view__remove-button:hover,
+.cart-view__remove-button:focus {
+  background-color: #e64a19;
+  outline: none;
 }
 
-/* Nút xóa toàn bộ giỏ hàng */
-.clear-cart-button {
-  display: block;
-  width: 100%;
-  background-color: #e74c3c;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
+.cart-view__total {
+  border-top: 1px solid #ddd;
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.cart-view__actions {
+  display: flex;
+  justify-content: space-between;
   margin-top: 20px;
-  transition: background-color 0.3s ease;
 }
 
-.clear-cart-button:hover {
-  background-color: #c0392b;
+.cart-view__clear-button,
+.cart-view__checkout-button {
+  background-color: var(--primary-color);
+  color: var(--text-color);
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color var(--transition-speed);
+}
+
+.cart-view__clear-button:hover,
+.cart-view__clear-button:focus,
+.cart-view__checkout-button:hover,
+.cart-view__checkout-button:focus {
+  background-color: var(--secondary-color);
+  outline: none;
+}
+
+.cart-view__empty {
+  text-align: center;
+  margin-top: 50px;
+  font-size: 16px;
+  color: #555;
 }
 </style>

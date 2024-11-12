@@ -3,15 +3,18 @@
     <!-- Header với nút Giỏ Hàng hiển thị số lượng sản phẩm -->
     <Header :cartItemCount="cartItemCount" @toggle-cart="toggleCartView" />
 
-    <!-- Nội dung của các route -->
-    <div class="main-content">
-      <router-view 
-        :cart="cart" 
-        @add-to-cart="addToCart" 
-        @remove-item="removeItemFromCart" 
-        @clear-cart="clearCart" 
-      />
-    </div>
+    <!-- Nội dung của các route với v-slot để truyền props -->
+    <main class="main-content">
+      <router-view v-slot="{ Component }">
+        <component
+          :is="Component"
+          @add-to-cart="addToCart"
+          @remove-item="removeItemFromCart"
+          @clear-cart="clearCart"
+          
+        />
+      </router-view>
+    </main>
 
     <!-- Footer xuất hiện trên tất cả các trang -->
     <Footer />
@@ -24,11 +27,13 @@
       @remove-item="removeItemFromCart" 
       @clear-cart="clearCart" 
       @close-cart="toggleCartView"
+      class="com-cart-view"
     />
   </div>
 </template>
 
 <script>
+import { ref, computed } from 'vue';
 import Header from './components/ComHeader.vue';
 import Footer from './components/ComFooter.vue';
 import ComCartView from './components/ComCartView.vue';
@@ -40,93 +45,122 @@ export default {
     Header,
     Footer,
     ComCartView,
+    
   },
 
-  data() {
-    return {
-      cart: [],
-      showCart: false,
+  setup() {
+    // Quản lý trạng thái giỏ hàng cục bộ
+    const cart = ref([]);
+    const showCart = ref(false);
+
+    // Tính toán số lượng sản phẩm trong giỏ hàng
+    const cartItemCount = computed(() => cart.value.length);
+
+    // Thêm sản phẩm vào giỏ hàng
+    const addToCart = (product) => {
+      cart.value.push(product);
     };
-  },
 
-  computed: {
-    cartItemCount() {
-      return this.cart.reduce((total, item) => total + item.quantity, 0);
-    },
-  },
-
-  methods: {
-    addToCart(product) {
-      const existingProduct = this.cart.find(item => item.id === product.id);
-      if (existingProduct) {
-        existingProduct.quantity += 1;
-      } else {
-        this.cart.push({ ...product, quantity: 1 });
+    // Xóa sản phẩm khỏi giỏ hàng
+    const removeItemFromCart = (product) => {
+      const index = cart.value.findIndex((item) => item.id === product.id);
+      if (index !== -1) {
+        cart.value.splice(index, 1);
       }
-    },
-    removeItemFromCart(product) {
-      this.cart = this.cart.filter(item => item.id !== product.id);
-    },
-    clearCart() {
-      this.cart = [];
-    },
-    toggleCartView() {
-      this.showCart = !this.showCart;
-    },
+    };
+
+    // Xóa toàn bộ giỏ hàng
+    const clearCart = () => {
+      cart.value = [];
+    };
+
+    // Hiển thị hoặc ẩn giỏ hàng
+    const toggleCartView = () => {
+      showCart.value = !showCart.value;
+    };
+
+    return {
+      cart,
+      cartItemCount,
+      showCart,
+      toggleCartView,
+      addToCart,
+      removeItemFromCart,
+      clearCart,
+    };
   },
 };
 </script>
 
 <style scoped>
+/* CSS Variables for Consistent Styling */
+:root {
+  --primary-color: #003366;
+  --secondary-color: #ffcc00;
+  --hover-color: #ffd54f;
+  --text-color: #ffffff;
+  --background-color: #f5f5f5;
+  --overlay-color: rgba(0, 0, 0, 0.5);
+  --cart-width: 350px;
+  --transition-speed: 0.3s;
+  --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Reset some basic styles */
 #app {
-  font-family: 'Roboto', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: var(--font-family);
+  background-color: var(--background-color);
 }
 
+/* Main Content */
 .main-content {
-  padding-bottom: 80px;
-}
-
-/* Footer Fixed */
-.footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
+  flex: 1;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
   width: 100%;
-  background-color: #2c3e50;
-  color: white;
-  text-align: center;
-  padding: 10px;
-  font-size: 14px;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
 }
 
-/* Overlay cho giỏ hàng */
+/* Cart Overlay */
 .cart-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 9;
+  background: var(--overlay-color);
+  z-index: 999;
+  transition: opacity var(--transition-speed);
 }
 
 /* Giỏ hàng sidebar */
-.cart-view {
+.com-cart-view {
   position: fixed;
   top: 0;
   right: 0;
-  width: 300px;
+  width: var(--cart-width);
   height: 100%;
-  background-color: white;
+  background-color: #ffffff;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
   padding: 20px;
   overflow-y: auto;
-  z-index: 10;
+  z-index: 1000;
+  transition: transform var(--transition-speed);
+}
+
+/* Responsive Design for Cart */
+@media (max-width: 768px) {
+  .com-cart-view {
+    width: 80%;
+  }
+}
+
+@media (max-width: 576px) {
+  .com-cart-view {
+    width: 100%;
+  }
 }
 </style>

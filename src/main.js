@@ -4,7 +4,7 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import router from './router';  // Đảm bảo router được import chính xác
 import store from './store';     // Đảm bảo store được import chính xác
-import './assets/styles/main.css';
+import './assets/styles/main.scss'; 
 
 
 // Tạo ứng dụng Vue và cài đặt router và store
