@@ -1,3 +1,4 @@
+
 <template>
   <div class="home-page">
     <!-- Carousel Banner Section -->
@@ -5,7 +6,7 @@
       <CarouselBanner @navigate="handleNavigate" />
     </section>
 
-    <!-- Phần sản phẩm nổi bật -->
+    <!-- Featured Products Section -->
     <section class="home-page__featured-products">
       <h2 class="home-page__section-title">Sản phẩm nổi bật</h2>
       <div class="home-page__product-list">
@@ -18,7 +19,7 @@
       </div>
     </section>
 
-    <!-- Tất cả sản phẩm với điều khiển phân trang -->
+    <!-- All Products Section with Pagination -->
     <section class="home-page__all-products">
       <h2 class="home-page__section-title">Tất cả sản phẩm</h2>
       <div class="home-page__product-list">
@@ -30,7 +31,7 @@
         />
       </div>
 
-      <!-- Điều khiển phân trang -->
+      <!-- Pagination Controls -->
       <div class="home-page__pagination" aria-label="Phân trang">
         <button
           :disabled="currentPage === 1"
@@ -65,8 +66,11 @@
 
 <script>
 import ProductCard from "../components/product/ProductCard.vue";
-import CarouselBanner from "../components/CarouselBanner.vue";
+import CarouselBanner from "../components/compo/CarouselBanner.vue";
+// import items from "../data/item.js";
 import { items } from "../data/item.js";
+
+
 
 export default {
   name: "HomePage",
@@ -98,19 +102,12 @@ export default {
     },
     addToCart(product) {
       this.$emit("add-to-cart", product);
-      // Bạn có thể thêm logic thêm sản phẩm vào giỏ hàng tại đây hoặc xử lý trong component cha
     },
     handleNavigate(route) {
-      // Giả sử bạn đang sử dụng Vue Router để điều hướng
       this.$router.push({ name: route });
-      // Nếu không sử dụng Vue Router, bạn có thể xử lý theo cách khác
-    },
-    formatPrice(price) {
-      return price.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' });
     },
   },
   created() {
-    // Khởi tạo sản phẩm nổi bật và tất cả sản phẩm
     this.featuredProducts = items.slice(0, 4);
     this.products = items.slice(4);
   },
@@ -118,7 +115,6 @@ export default {
 </script>
 
 <style scoped>
-/* CSS Variables for Consistent Styling */
 :root {
   --primary-color: #003366;
   --secondary-color: #ffcc00;
@@ -129,7 +125,7 @@ export default {
   --transition-speed: 0.3s;
 }
 
-/* Container Styling */
+/* Home Page Styling */
 .home-page {
   font-family: var(--font-family);
   background-color: var(--background-color);

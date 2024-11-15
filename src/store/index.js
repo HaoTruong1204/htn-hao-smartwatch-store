@@ -1,17 +1,22 @@
 // src/store/index.js
-import { createStore } from 'vuex';
-import auth from './modules/auth';
-import cart from './modules/cart';
-import products from './modules/products';
-import orders from './modules/orders';
-import admin from './modules/admin';
+import { reactive } from 'vue';
 
-export default createStore({
-    modules: {
-        auth,
-        cart,
-        products,
-        orders,
-        admin,
-    },
+const store = reactive({
+  // Global state
+  user: null, // Thông tin người dùng
+  isLoggedIn: false, // Trạng thái đăng nhập
+
+  // Actions
+  login(user) {
+    this.user = user;
+    this.isLoggedIn = true;
+    localStorage.setItem('authToken', 'example-token'); // Giả lập token
+  },
+  logout() {
+    this.user = null;
+    this.isLoggedIn = false;
+    localStorage.removeItem('authToken');
+  },
 });
+
+export default store;

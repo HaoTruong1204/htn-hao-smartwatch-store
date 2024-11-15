@@ -4,7 +4,7 @@
       <!-- Logo -->
       <h1
         :class="$style.logo"
-        @click="$emit('navigate', 'home')"
+        @click="navigateHome"
         tabindex="0"
         @keydown.enter="navigateHome"
       >
@@ -14,8 +14,8 @@
       <!-- Navigation Links with Dropdown for Products -->
       <nav :class="$style.nav" aria-label="Main Navigation">
         <a
-          @click.prevent="$emit('navigate', 'home')"
-          href="#"
+          @click.prevent="navigateTo('/')"
+          href="javascript:void(0);"
           :class="$style.navLink"
         >
           Trang chủ
@@ -34,24 +34,24 @@
             role="menu"
           >
             <a
-              @click.prevent="$emit('navigate', 'smartwatches')"
-              href="#"
+              @click.prevent="navigateTo('/smartwatches')"
+              href="javascript:void(0);"
               :class="$style.dropdownItem"
               role="menuitem"
             >
               Đồng hồ thông minh
             </a>
             <a
-              @click.prevent="$emit('navigate', 'luxury-watches')"
-              href="#"
+              @click.prevent="navigateTo('/luxury-watches')"
+              href="javascript:void(0);"
               :class="$style.dropdownItem"
               role="menuitem"
             >
               Đồng hồ cao cấp
             </a>
             <a
-              @click.prevent="$emit('navigate', 'accessories')"
-              href="#"
+              @click.prevent="navigateTo('/accessories')"
+              href="javascript:void(0);"
               :class="$style.dropdownItem"
               role="menuitem"
             >
@@ -59,30 +59,31 @@
             </a>
           </div>
         </div>
+
         <a
-          @click.prevent="$emit('navigate', 'new-products')"
-          href="#"
+          @click.prevent="navigateTo('/new-products')"
+          href="javascript:void(0);"
           :class="$style.navLink"
         >
           Sản phẩm mới
         </a>
         <a
-          @click.prevent="$emit('navigate', 'promo')"
-          href="#"
+          @click.prevent="navigateTo('/promo')"
+          href="javascript:void(0);"
           :class="$style.navLink"
         >
           Khuyến mãi
         </a>
         <a
-          @click.prevent="$emit('navigate', 'blog')"
-          href="#"
+          @click.prevent="navigateTo('/blog')"
+          href="javascript:void(0);"
           :class="$style.navLink"
         >
           Blog
         </a>
         <a
-          @click.prevent="$emit('navigate', 'contact')"
-          href="#"
+          @click.prevent="navigateTo('/contact')"
+          href="javascript:void(0);"
           :class="$style.navLink"
         >
           Liên hệ
@@ -111,7 +112,7 @@
       <div :class="$style.icons">
         <!-- User Account Button with "Đăng nhập" -->
         <button
-          @click="$emit('navigate', 'account')"
+          @click="navigateTo('/account')"
           :class="$style.iconButton"
           aria-label="Đăng nhập"
         >
@@ -119,7 +120,7 @@
         </button>
         <!-- Cart Button -->
         <button
-          @click="$emit('toggle-cart')"
+          @click="toggleCart"
           :class="$style.iconButton"
           aria-label="Giỏ hàng"
         >
@@ -140,8 +141,8 @@
     <!-- Navigation Links for Mobile -->
     <nav v-if="isMenuOpen" :class="$style.navMobile" aria-label="Mobile Navigation">
       <a
-        @click.prevent="$emit('navigate', 'home')"
-        href="#"
+        @click.prevent="navigateTo('/')"
+        href="javascript:void(0);"
         :class="$style.navMobileLink"
       >
         Trang chủ
@@ -160,24 +161,24 @@
           role="menu"
         >
           <a
-            @click.prevent="$emit('navigate', 'smartwatches')"
-            href="#"
+            @click.prevent="navigateTo('/smartwatches')"
+            href="javascript:void(0);"
             :class="$style.dropdownMobileItem"
             role="menuitem"
           >
             Đồng hồ thông minh
           </a>
           <a
-            @click.prevent="$emit('navigate', 'luxury-watches')"
-            href="#"
+            @click.prevent="navigateTo('/luxury-watches')"
+            href="javascript:void(0);"
             :class="$style.dropdownMobileItem"
             role="menuitem"
           >
             Đồng hồ cao cấp
           </a>
           <a
-            @click.prevent="$emit('navigate', 'accessories')"
-            href="#"
+            @click.prevent="navigateTo('/accessories')"
+            href="javascript:void(0);"
             :class="$style.dropdownMobileItem"
             role="menuitem"
           >
@@ -185,30 +186,24 @@
           </a>
         </div>
       </div>
+
       <a
-        @click.prevent="$emit('navigate', 'new-products')"
-        href="#"
-        :class="$style.navMobileLink"
-      >
-        Sản phẩm mới
-      </a>
-      <a
-        @click.prevent="$emit('navigate', 'promo')"
-        href="#"
+        @click.prevent="navigateTo('/promo')"
+        href="javascript:void(0);"
         :class="$style.navMobileLink"
       >
         Khuyến mãi
       </a>
       <a
-        @click.prevent="$emit('navigate', 'blog')"
-        href="#"
+        @click.prevent="navigateTo('/blog')"
+        href="javascript:void(0);"
         :class="$style.navMobileLink"
       >
         Blog
       </a>
       <a
-        @click.prevent="$emit('navigate', 'contact')"
-        href="#"
+        @click.prevent="navigateTo('/contact')"
+        href="javascript:void(0);"
         :class="$style.navMobileLink"
       >
         Liên hệ
@@ -236,11 +231,10 @@ export default {
   },
   methods: {
     search() {
-      this.$emit("search", this.searchQuery);
+      this.$router.push({ path: '/search', query: { q: this.searchQuery } });
     },
     toggleMenu() {
       this.isMenuOpen = !this.isMenuOpen;
-      // Đóng dropdown khi mở/đóng menu
       if (!this.isMenuOpen) {
         this.isMobileDropdownOpen = false;
       }
@@ -252,7 +246,15 @@ export default {
       this.isMobileDropdownOpen = !this.isMobileDropdownOpen;
     },
     navigateHome() {
-      this.$emit("navigate", "home");
+      this.$router.push('/');
+    },
+    navigateTo(route) {
+      this.$router.push(route);
+      this.isDropdownOpen = false;
+      this.isMobileDropdownOpen = false;
+    },
+    toggleCart() {
+      this.$emit("toggle-cart");
     },
     handleClickOutside(event) {
       const dropdown = this.$refs.dropdown;
@@ -266,7 +268,6 @@ export default {
     },
   },
   mounted() {
-    // Đóng dropdown khi click ngoài
     document.addEventListener("click", this.handleClickOutside);
   },
   beforeUnmount() {
@@ -274,6 +275,7 @@ export default {
   },
 };
 </script>
+
 
 <style module>
 /* CSS Variables for Consistent Styling */
@@ -327,6 +329,7 @@ export default {
   color: var(--secondary-color);
   cursor: pointer;
   transition: color var(--transition-speed);
+  cursor: pointer; 
 }
 
 .logo:hover,
@@ -586,7 +589,7 @@ export default {
 }
 
 .show {
-  display: flex;
+  display: block;
 }
 
 /* Slide Down Animation for Mobile Navigation */

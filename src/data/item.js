@@ -615,12 +615,8 @@ export const items = [
       additionalInfo: 'Thiết kế sang trọng, bảo vệ đồng hồ tốt.'
     },
 
-
-
-
   ];
 
-  
   
 // Hàm lấy sản phẩm theo ID
 export function getItemById(id) {

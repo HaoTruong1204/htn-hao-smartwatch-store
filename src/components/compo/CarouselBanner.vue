@@ -1,5 +1,5 @@
 <template>
-    <div class="carousel-banner" role="region" aria-label="Carousel">
+    <div id="carouselBanner" class="carousel-banner" role="region" aria-label="Carousel">
       <div class="carousel" role="list">
         <div
           class="carousel-item"
@@ -20,7 +20,7 @@
           </picture>
           <div class="carousel-content">
             <h1>{{ slide.title }}</h1>
-            <p>{{ slide.subtitle }}</p>
+            <p style="color: yellow;">{{ slide.subtitle }}</p>
             <button
               @click="$emit('navigate', slide.link)"
               class="shop-now-button"
@@ -199,7 +199,7 @@
       this.startAutoplay();
   
       // Tạm dừng autoplay khi hover vào carousel
-      const carouselElement = this.$el.querySelector(".carousel-banner");
+      const carouselElement = document.getElementById('carouselBanner');
       carouselElement.addEventListener("mouseenter", this.stopAutoplay);
       carouselElement.addEventListener("mouseleave", this.startAutoplay);
   

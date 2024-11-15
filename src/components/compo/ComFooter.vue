@@ -3,7 +3,7 @@
     <div class="footer__content">
       <!-- Section: Store Information -->
       <div class="footer__section footer__store-info">
-        <h3 class="footer__title">HTN HAO Store</h3>
+        <h3 class="footer__title">HTN HAO STORE</h3>
         <p class="footer__description">
           Nơi cung cấp các sản phẩm đồng hồ thông minh và phụ kiện chính hãng, đảm bảo chất lượng.
         </p>
@@ -37,7 +37,7 @@
         <ul class="footer__contact-list">
           <li class="footer__contact-item">
             <i class="fas fa-phone-alt footer__contact-icon"></i>
-            <span>+84 123 456 789</span>
+            <span>+84 337 639 500</span>
           </li>
           <li class="footer__contact-item">
             <i class="fas fa-envelope footer__contact-icon"></i>
@@ -45,7 +45,7 @@
           </li>
           <li class="footer__contact-item">
             <i class="fas fa-map-marker-alt footer__contact-icon"></i>
-            <span>Gò Vấp, Hồ Chí Minh, Việt Nam</span>
+            <span style="">371 Nguyễn Kiệm, Trường Đại Học Gia Định, Gò Vấp, TP. HCM</span>
           </li>
         </ul>
       </div>
@@ -85,6 +85,7 @@ export default {
 
 <style scoped>
 /* CSS Variables for Consistent Styling */
+
 :root {
   --primary-color: #003366;
   --secondary-color: #ffcc00;

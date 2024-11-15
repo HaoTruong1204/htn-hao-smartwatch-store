@@ -34,9 +34,9 @@
 
 <script>
 import { ref, computed } from 'vue';
-import Header from './components/ComHeader.vue';
-import Footer from './components/ComFooter.vue';
-import ComCartView from './components/ComCartView.vue';
+import Header from './components/compo/ComHeader.vue';
+import Footer from './components/compo/ComFooter.vue';
+import ComCartView from './components/compo/ComCartView.vue';
 
 export default {
   name: 'App',
