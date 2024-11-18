@@ -7,32 +7,32 @@ import emitter from '../plugins/eventBus'; // Import Event Bus
 const routes = [
   { 
     path: '/', 
-    component: () => import('../pages/HomePage.vue'), 
+    component: () => import('../pages/ComHomePage.vue'), 
     name: 'Home' 
   },
   {
     path: '/smartwatches',
-    component: () => import('../pages/Smartwatches.vue'),
+    component: () => import('../pages/ComSmartwatches.vue'),
     name: 'Smartwatches'
   },
   { 
     path: '/luxury-watches', 
-    component: () => import('../pages/LuxuryWatches.vue'), 
+    component: () => import('../pages/ComLuxuryWatches.vue'), 
     name: 'LuxuryWatches' 
   },
   { 
     path: '/accessories', 
-    component: () => import('../pages/Accessories.vue'), 
+    component: () => import('../pages/ComAccessories.vue'), 
     name: 'Accessories' 
   },
   { 
     path: '/new-products', 
-    component: () => import('../pages/NewProducts.vue'), 
+    component: () => import('../pages/ComNewProducts.vue'), 
     name: 'NewProducts' 
   },
   { 
     path: '/product/:id', 
-    component: () => import('../pages/ProductDetail.vue'), 
+    component: () => import('../pages/ComProductDetail.vue'), 
     name: 'ProductDetail', 
     props: true 
   },
@@ -43,92 +43,107 @@ const routes = [
   },
   { 
     path: '/checkout', 
-    component: () => import('../pages/CheckoutPage.vue'), 
+    component: () => import('../pages/ComCheckoutPage.vue'), 
     name: 'Checkout' 
   },
   { 
     path: '/order-history', 
-    component: () => import('../pages/OrderHistory.vue'), 
+    component: () => import('../pages/ComOrderHistory.vue'), 
     name: 'OrderHistory',
     meta: { requiresAuth: true },  
   },
   { 
     path: '/profile', 
-    component: () => import('../pages/UserProfile.vue'), 
+    component: () => import('../pages/ComUserProfile.vue'), 
     name: 'UserProfile',
     meta: { requiresAuth: true },  
   },
   { 
     path: '/account',
-    component: () => import('../pages/AccountPage.vue'),
+    component: () => import('../pages/ComAccountPage.vue'),
     name: 'Account',
     meta: { requiresAuth: true },
   },
   { 
     path: '/login', 
-    component: () => import('../pages/LoginPage.vue'), 
+    component: () => import('../pages/ComLoginPage.vue'), 
     name: 'Login' 
   },
   { 
     path: '/register', 
-    component: () => import('../pages/RegisterPage.vue'), 
+    component: () => import('../pages/ComRegisterPage.vue'), 
     name: 'Register' 
   },
   { 
     path: '/contact', 
-    component: () => import('../pages/ContactPage.vue'), 
+    component: () => import('../pages/ComContactPage.vue'), 
     name: 'Contact' 
   },
   { 
     path: '/about', 
-    component: () => import('../pages/AboutPage.vue'), 
+    component: () => import('../pages/ComAboutPage.vue'), 
     name: 'About' 
   },
   { 
     path: '/terms', 
-    component: () => import('../pages/TermsPage.vue'), 
+    component: () => import('../pages/ComTermsPage.vue'), 
     name: 'Terms' 
   },
-  { 
-    path: '/privacy-policy', 
-    component: () => import('../pages/PrivacyPolicyPage.vue'), 
-    name: 'PrivacyPolicy' 
+  {
+    path: '/privacy-policy',  // Đảm bảo URL đúng
+    component: () => import('../pages/ComPrivacyPolicyPage.vue'),  // Đảm bảo đường dẫn đúng với file
+    name: 'PrivacyPolicy'  // Đảm bảo tên route đúng
   },
+  
   { 
     path: '/blog', 
-    component: () => import('../pages/BlogListPage.vue'), 
+    component: () => import('../pages/ComBlogListPage.vue'), 
     name: 'BlogList' 
   },
   { 
     path: '/blog/:id', 
-    component: () => import('../pages/BlogDetailPage.vue'), 
+    component: () => import('../pages/ComBlogDetailPage.vue'), 
     name: 'BlogDetail', 
     props: true 
   },
+  {
+    path: '/blogs/:id', // Đường dẫn động với tham số id
+    name: 'BlogDetail',
+    component: () => import('../pages/ComBlogDetailPage.vue'),
+    props: true, // Kích hoạt truyền tham số qua props
+  },
   { 
     path: '/search', 
-    component: () => import('../pages/SearchResultsPage.vue'), 
+    component: () => import('../pages/ComSearchResultsPage.vue'), 
     name: 'SearchResults' 
   },
   { 
     path: '/all-products', 
-    component: () => import('../pages/AllProducts.vue'), 
+    component: () => import('../pages/ComAllProducts.vue'), 
     name: 'AllProducts' 
   },
   { 
     path: '/order-confirmation/:orderId', 
-    component: () => import('../pages/OrderConfirmation.vue'), 
+    component: () => import('../pages/ComOrderConfirmation.vue'), 
     name: 'OrderConfirmation', 
     props: true,
     meta: { requiresAuth: true }, 
   },
+
+  {
+    path: '/promo',
+    name: 'Promo',
+    component: () => import('@/pages/ComPromo.vue'),
+  },
+  
   { 
     path: '/:catchAll(.*)', 
-    component: () => import('../pages/NotFoundPage.vue'), 
+    component: () => import('../pages/ComNotFoundPage.vue'), 
     name: 'NotFound' 
   }
 ];
 
+    
 // Tạo router với các route đã định nghĩa
 const router = createRouter({
   history: createWebHistory(),

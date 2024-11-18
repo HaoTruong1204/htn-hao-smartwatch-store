@@ -52,7 +52,7 @@ import { useRouter } from 'vue-router';
 import Header from './components/compo/ComHeader.vue';
 import Footer from './components/compo/ComFooter.vue';
 import ComCartView from './components/cart/ComCartView.vue';
-import Notification from './components/Notification.vue';
+import Notification from './components/ComNotification.vue';
 import emitter from './plugins/eventBus'; // Giả sử bạn đã cài đặt Event Bus
 
 export default {

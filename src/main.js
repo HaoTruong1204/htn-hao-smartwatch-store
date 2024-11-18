@@ -4,7 +4,7 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import store from './store';
 import router from './router';
-import Notification from './components/Notification.vue'; // Component Notification
+import Notification from './components/ComNotification.vue'; // Component Notification
 
 const app = createApp(App);
 

@@ -4,8 +4,10 @@ import { createStore } from 'vuex';
 
 export default createStore({
   state: {
-    user: JSON.parse(localStorage.getItem('authUser')) || null, // Lấy người dùng từ localStorage nếu có
-    cart: [], // Giỏ hàng
+    // Lấy người dùng từ localStorage nếu có
+    user: JSON.parse(localStorage.getItem('authUser')) || null, 
+    // Lấy giỏ hàng từ localStorage nếu có
+    cart: JSON.parse(localStorage.getItem('cart')) || [], 
     notification: {
       visible: false,
       message: '',
@@ -24,31 +26,39 @@ export default createStore({
   mutations: {
     SET_USER(state, user) {
       state.user = user;
-      localStorage.setItem('authUser', JSON.stringify(user));
+      localStorage.setItem('authUser', JSON.stringify(user)); // Lưu người dùng vào localStorage
     },
     CLEAR_USER(state) {
       state.user = null;
-      localStorage.removeItem('authUser');
+      localStorage.removeItem('authUser'); // Xóa người dùng từ localStorage
     },
     ADD_TO_CART(state, product) {
       const existingProduct = state.cart.find(item => item.id === product.id);
       if (existingProduct) {
-        existingProduct.quantity += 1;
+        existingProduct.quantity += 1; // Tăng số lượng nếu sản phẩm đã có trong giỏ
       } else {
-        state.cart.push({ ...product, quantity: 1 });
+        state.cart.push({ ...product, quantity: 1 }); // Thêm sản phẩm mới vào giỏ
       }
+      // Lưu giỏ hàng vào localStorage
+      localStorage.setItem('cart', JSON.stringify(state.cart));
     },
     REMOVE_FROM_CART(state, productId) {
       state.cart = state.cart.filter(item => item.id !== productId);
+      // Lưu giỏ hàng vào localStorage
+      localStorage.setItem('cart', JSON.stringify(state.cart));
     },
     CLEAR_CART(state) {
       state.cart = [];
+      // Lưu giỏ hàng vào localStorage
+      localStorage.setItem('cart', JSON.stringify(state.cart));
     },
     UPDATE_CART_QUANTITY(state, updatedItem) {
       const product = state.cart.find(item => item.id === updatedItem.id);
       if (product) {
         product.quantity = updatedItem.quantity;
       }
+      // Lưu giỏ hàng vào localStorage
+      localStorage.setItem('cart', JSON.stringify(state.cart));
     },
     SHOW_NOTIFICATION(state, { message, type }) {
       state.notification.message = message;
@@ -90,7 +100,7 @@ export default createStore({
       commit('SHOW_NOTIFICATION', payload);
       setTimeout(() => {
         commit('HIDE_NOTIFICATION');
-      }, 3000);
+      }, 3000); // Tự động ẩn thông báo sau 3 giây
     },
     hideNotification({ commit }) {
       commit('HIDE_NOTIFICATION');

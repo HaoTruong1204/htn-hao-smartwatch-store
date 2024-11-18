@@ -490,7 +490,9 @@ export default {
   top: 0;
   width: 100%;
   z-index: 1000;
+  height: 140px;
   font-family: var(--font-family);
+  transition: background-color var(--transition-speed);
 }
 
 /* Header Content */
