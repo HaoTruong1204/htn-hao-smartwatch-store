@@ -1,80 +1,112 @@
 <template>
-    <div class="cart-item">
-      <img :src="item.image" alt="Product Image" class="product-image" />
-      <div class="product-details">
-        <h3>{{ item.name }}</h3>
-        <p>Giá: {{ formatCurrency(item.price) }}</p>
-        <div class="quantity">
-          <button @click="updateQuantity(item.id, item.quantity - 1)" :disabled="item.quantity <= 1">-</button>
-          <span>{{ item.quantity }}</span>
-          <button @click="updateQuantity(item.id, item.quantity + 1)">+</button>
-        </div>
+  <div class="cart-item">
+    <!-- Product Image -->
+    <img :src="item.image" :alt="`Hình ảnh của ${item.name}`" class="cart-item-image" />
+
+    <!-- Product Details -->
+    <div class="cart-item-details">
+      <h2 class="cart-item-name">{{ item.name }}</h2>
+      <p class="cart-item-price">{{ formatPrice(item.price) }}</p>
+
+      <!-- Quantity Controls -->
+      <div class="cart-item-quantity">
+        <label for="quantity">Số lượng:</label>
+        <input
+          type="number"
+          id="quantity"
+          v-model.number="quantity"
+          @change="handleUpdateQuantity"
+          min="1"
+          :max="item.stock"
+          aria-label="Số lượng sản phẩm"
+        />
       </div>
-      <button class="remove-btn" @click="removeFromCart(item.id)">Xóa</button>
+
+      <!-- Remove Button -->
+      <button
+        type="button"
+        class="remove-button"
+        @click="handleRemoveFromCart"
+        aria-label="Xóa sản phẩm khỏi giỏ hàng"
+      >
+        Xóa
+      </button>
     </div>
-  </template>
-  
-  <script>
-  export default {
-    props: {
-      item: {
-        type: Object,
-        required: true,
-      },
+  </div>
+</template>
+
+<script>
+import { mapActions } from "vuex";
+
+export default {
+  name: "CartItem",
+  props: {
+    item: {
+      type: Object,
+      required: true,
     },
-    methods: {
-      formatCurrency(value) {
-        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
-      },
-      updateQuantity(productId, quantity) {
-        this.$store.dispatch('cart/updateQuantity', { productId, quantity });
-      },
-      removeFromCart(productId) {
-        this.$store.dispatch('cart/removeFromCart', productId);
-      },
+  },
+  data() {
+    return {
+      quantity: this.item.quantity,
+    };
+  },
+  watch: {
+    item(newVal) {
+      this.quantity = newVal.quantity;
     },
-  };
-  </script>
-  
-  <style scoped>
-  .cart-item {
-    display: flex;
-    align-items: center;
-    padding: 16px;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  .product-image {
-    width: 80px;
-    height: 80px;
-    margin-right: 16px;
-  }
-  
-  .product-details {
-    flex-grow: 1;
-  }
-  
-  .quantity {
-    display: flex;
-    align-items: center;
-  }
-  
-  .quantity button {
-    width: 24px;
-    height: 24px;
-    margin: 0 8px;
-    border: none;
-    background-color: #2a9d8f;
-    color: #fff;
-    cursor: pointer;
-  }
-  
-  .remove-btn {
-    border: none;
-    background-color: #e63946;
-    color: #fff;
-    padding: 8px;
-    cursor: pointer;
-  }
-  </style>
-  
+  },
+  methods: {
+    // Map actions từ module 'cart' với namespace
+    ...mapActions('cart', ['removeProductFromCart', 'updateProductQuantity']),
+
+    /**
+     * Định dạng giá tiền sang VND.
+     * @param {number} price Giá tiền cần định dạng.
+     * @returns {string} Giá tiền đã định dạng.
+     */
+    formatPrice(price) {
+      return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND',
+      }).format(price);
+    },
+
+    /**
+     * Xóa sản phẩm khỏi giỏ hàng.
+     */
+    handleRemoveFromCart() {
+      if (confirm("Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?")) {
+        this.removeProductFromCart(this.item.id)
+          .then(() => {
+            this.$toast.success(`Đã xóa "${this.item.name}" khỏi giỏ hàng.`);
+          })
+          .catch(() => {
+            this.$toast.error("Có lỗi xảy ra khi xóa sản phẩm. Vui lòng thử lại.");
+          });
+      }
+    },
+
+    /**
+     * Cập nhật số lượng sản phẩm trong giỏ hàng.
+     */
+    handleUpdateQuantity() {
+      if (this.quantity < 1) {
+        this.$toast.error("Số lượng không hợp lệ.");
+        this.quantity = 1;
+      }
+      this.updateProductQuantity({ productId: this.item.id, quantity: this.quantity })
+        .then(() => {
+          this.$toast.success("Cập nhật số lượng thành công.");
+        })
+        .catch(() => {
+          this.$toast.error("Có lỗi xảy ra khi cập nhật số lượng.");
+        });
+    },
+  },
+};
+</script>
+
+<style scoped>
+/* Các style của bạn */
+</style>

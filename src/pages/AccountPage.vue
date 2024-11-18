@@ -1,124 +1,104 @@
 <template>
-    <div class="account-page">
-      <div class="account-container">
-        <h2>Tài Khoản Của Tôi</h2>
-  
-        <div v-if="user">
-          <div class="account-info">
-            <h3>Thông Tin Cá Nhân</h3>
-            <p><strong>Họ và Tên:</strong> {{ user.name }}</p>
-            <p><strong>Email:</strong> {{ user.email }}</p>
-            <p><strong>Số Điện Thoại:</strong> {{ user.phone || 'Chưa cập nhật' }}</p>
-          </div>
-  
-          <button @click="handleLogout" class="logout-button">Đăng Xuất</button>
-        </div>
-  
-        <div v-else>
-          <p>Bạn cần đăng nhập để xem thông tin tài khoản.</p>
-          <router-link to="/login" class="login-link">Đăng Nhập</router-link>
-        </div>
-      </div>
+  <div class="account-page">
+    <h2>Thông Tin Tài Khoản</h2>
+
+    <!-- Hiển thị thông tin người dùng nếu đã đăng nhập -->
+    <div v-if="user" class="account-details">
+      <p><strong>Tên:</strong> {{ user.name }}</p>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <!-- Thêm thông tin khác nếu cần -->
+      <p><strong>Số điện thoại:</strong> {{ user.phone || "Chưa cập nhật" }}</p>
+      <p><strong>Ngày đăng ký:</strong> {{ formatDate(user.createdAt) }}</p>
+      <button @click="logoutUser" class="logout-button">Đăng Xuất</button>
     </div>
-  </template>
-  
-  <script>
-  import axios from "axios";
-  
-  export default {
-    name: "AccountPage",
-    data() {
-      return {
-        user: null,
-      };
+
+    <!-- Nếu không tìm thấy thông tin người dùng -->
+    <div v-else class="not-logged-in">
+      <p>Bạn chưa đăng nhập. Vui lòng <router-link to="/login">Đăng Nhập</router-link>.</p>
+    </div>
+  </div>
+</template>
+<script>
+export default {
+  name: "AccountPage",
+  data() {
+    return {
+      user: null, // Lưu thông tin người dùng đăng nhập
+    };
+  },
+  created() {
+    // Lấy thông tin người dùng từ localStorage
+    const currentUser = localStorage.getItem("currentUser");
+    if (currentUser) {
+      this.user = JSON.parse(currentUser);
+    } else {
+      // Nếu chưa đăng nhập, chuyển hướng đến trang đăng nhập
+      this.$router.push("/login");
+    }
+  },
+  methods: {
+    // Định dạng ngày tháng
+    formatDate(dateString) {
+      if (!dateString) return "Không xác định";
+      const date = new Date(dateString);
+      return date.toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
     },
-    async created() {
-      try {
-        const token = localStorage.getItem("authToken");
-        if (!token) throw new Error("Người dùng chưa đăng nhập");
-  
-        const response = await axios.get("/api/account", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-  
-        if (response.status === 200) {
-          this.user = response.data;
-        }
-      } catch (error) {
-        console.error(error);
-        this.user = null;
-      }
+    // Xử lý đăng xuất
+    logoutUser() {
+      localStorage.removeItem("currentUser");
+      this.user = null;
+      this.$router.push("/login");
+      alert("Bạn đã đăng xuất thành công!");
     },
-    methods: {
-      handleLogout() {
-        localStorage.removeItem("authToken");
-        this.user = null;
-        this.$router.push("/login");
-      },
-    },
-  };
-  </script>
-  
-  <style scoped>
-  .account-page {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 80vh;
-    background-color: #f5f7fa;
-  }
-  
-  .account-container {
-    background-color: #ffffff;
-    padding: 40px 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px;
-  }
-  
-  h2 {
-    text-align: center;
-    color: #003366;
-  }
-  
-  .account-info {
-    margin-top: 20px;
-  }
-  
-  .account-info p {
-    font-size: 16px;
-    margin-bottom: 10px;
-  }
-  
-  .logout-button {
-    display: block;
-    margin: 20px auto 0;
-    padding: 10px 20px;
-    background-color: #e74c3c;
-    color: #ffffff;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .logout-button:hover {
-    background-color: #c0392b;
-  }
-  
-  .login-link {
-    display: block;
-    text-align: center;
-    margin-top: 20px;
-    color: #003366;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  
-  .login-link:hover {
-    text-decoration: underline;
-  }
-  </style>
-  
+  },
+};
+</script>
+<style scoped>
+.account-page {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: "Poppins", sans-serif;
+  text-align: center;
+}
+
+h2 {
+  color: #003366;
+  margin-bottom: 20px;
+}
+
+.account-details p {
+  font-size: 16px;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.logout-button {
+  margin-top: 20px;
+  padding: 12px 20px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: #c0392b;
+}
+
+.not-logged-in {
+  font-size: 16px;
+  line-height: 1.5;
+  margin-top: 20px;
+}
+</style>

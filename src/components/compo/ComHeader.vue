@@ -1,28 +1,27 @@
+<!-- src/components/ComHeader.vue -->
+
 <template>
-  <header :class="$style.header">
-    <div :class="$style.headerContent">
+  <header class="header">
+    <div class="headerContent">
       <!-- Logo -->
       <h1
-        :class="$style.logo"
+        class="logo"
         @click="navigateHome"
         tabindex="0"
         @keydown.enter="navigateHome"
       >
-        HTN HAO STORE
-      </h1>
-
+       HTN HAO STORE</h1>
       <!-- Navigation Links with Dropdown for Products -->
-      <nav :class="$style.nav" aria-label="Main Navigation">
-        <a
-          @click.prevent="navigateTo('/')"
-          href="javascript:void(0);"
-          :class="$style.navLink"
+      <nav class="nav" aria-label="Main Navigation">
+        <router-link
+          to="/"
+          class="navLink"
         >
           Trang chủ
-        </a>
-        <div :class="$style.dropdown" ref="dropdown">
+        </router-link>
+        <div class="dropdown" ref="dropdown">
           <button
-            :class="$style.dropdownButton"
+            class="dropdownButton"
             aria-haspopup="true"
             :aria-expanded="isDropdownOpen ? 'true' : 'false'"
             @click="toggleDropdown"
@@ -30,68 +29,65 @@
             Sản phẩm ▼
           </button>
           <div
-            :class="[$style.dropdownContent, { [$style.show]: isDropdownOpen }]"
+            class="dropdownContent"
+            :class="{ show: isDropdownOpen }"
             role="menu"
           >
-            <a
-              @click.prevent="navigateTo('/smartwatches')"
-              href="javascript:void(0);"
-              :class="$style.dropdownItem"
+            <router-link
+              to="/smartwatches"
+              class="dropdownItem"
               role="menuitem"
+              @click="closeDropdown"
             >
               Đồng hồ thông minh
-            </a>
-            <a
-              @click.prevent="navigateTo('/luxury-watches')"
-              href="javascript:void(0);"
-              :class="$style.dropdownItem"
+            </router-link>
+            <router-link
+              to="/luxury-watches"
+              class="dropdownItem"
               role="menuitem"
+              @click="closeDropdown"
             >
               Đồng hồ cao cấp
-            </a>
-            <a
-              @click.prevent="navigateTo('/accessories')"
-              href="javascript:void(0);"
-              :class="$style.dropdownItem"
+            </router-link>
+            <router-link
+              to="/accessories"
+              class="dropdownItem"
               role="menuitem"
+              @click="closeDropdown"
             >
               Phụ kiện
-            </a>
+            </router-link>
           </div>
         </div>
 
-        <a
-          @click.prevent="navigateTo('/new-products')"
-          href="javascript:void(0);"
-          :class="$style.navLink"
+        <router-link
+          to="/new-products"
+          class="navLink"
         >
           Sản phẩm mới
-        </a>
-        <a
-          @click.prevent="navigateTo('/promo')"
-          href="javascript:void(0);"
-          :class="$style.navLink"
+        </router-link>
+        <router-link
+          to="/promo"
+          class="navLink"
         >
           Khuyến mãi
-        </a>
-        <a
-          @click.prevent="navigateTo('/blog')"
-          href="javascript:void(0);"
-          :class="$style.navLink"
+        </router-link>
+        <router-link
+          to="/blog"
+          class="navLink"
         >
           Blog
-        </a>
-        <a
-          @click.prevent="navigateTo('/contact')"
-          href="javascript:void(0);"
-          :class="$style.navLink"
+        </router-link>
+        <router-link
+          to="/contact"
+          class="navLink"
         >
           Liên hệ
-        </a>
+        </router-link>
       </nav>
 
       <!-- Search Bar -->
-      <div :class="$style.searchBar">
+      <div class="searchBar">
         <input
           type="text"
           placeholder="Tìm kiếm sản phẩm..."
@@ -101,7 +97,7 @@
         />
         <button
           @click="search"
-          :class="$style.searchButton"
+          class="searchButton"
           aria-label="Search"
         >
           🔍
@@ -109,28 +105,63 @@
       </div>
 
       <!-- User Account and Cart Icons -->
-      <div :class="$style.icons">
-        <!-- User Account Button with "Đăng nhập" -->
-        <button
-          @click="navigateTo('/account')"
-          :class="$style.iconButton"
-          aria-label="Đăng nhập"
-        >
-          👤 <span :class="$style.loginText">Đăng nhập</span>
-        </button>
+      <div class="icons">
+        <!-- User Account Button -->
+        <div v-if="isAuthenticated" class="user-dropdown" ref="userDropdown">
+          <button
+            @click="toggleUserDropdown"
+            class="iconButton"
+            aria-haspopup="true"
+            :aria-expanded="isUserDropdownOpen ? 'true' : 'false'"
+            aria-label="Thông tin tài khoản"
+          >
+            👤 <span class="userName">Chào, {{ currentUser.name }}</span> ▼
+          </button>
+          <div
+            class="userDropdownContent"
+            :class="{ show: isUserDropdownOpen }"
+            role="menu"
+          >
+            <router-link
+              to="/account"
+              class="userDropdownItem button-beautiful"
+              role="menuitem"
+              @click="closeUserDropdown"
+            >
+              Tài khoản
+            </router-link>
+            <button
+              @click="logoutUser"
+              class="userDropdownItem logout"
+              role="menuitem"
+            >
+              Đăng xuất
+            </button>
+          </div>
+        </div>
+        <div v-else>
+          <button
+            @click="navigateTo('/login')"
+            class="iconButton"
+            aria-label="Đăng nhập"
+          >
+            👤 <span class="loginText">Đăng nhập</span>
+          </button>
+        </div>
+
         <!-- Cart Button -->
         <button
           @click="toggleCart"
-          :class="$style.iconButton"
+          class="iconButton"
           aria-label="Giỏ hàng"
         >
-          🛒 <span :class="$style.cartCount">{{ cartItemCount }}</span>
+          🛒 <span class="cartCount">{{ cartItemCount }}</span>
         </button>
       </div>
 
       <!-- Toggle Button for Mobile -->
       <button
-        :class="$style.menuToggle"
+        class="menuToggle"
         @click="toggleMenu"
         aria-label="Toggle Menu"
       >
@@ -139,17 +170,17 @@
     </div>
 
     <!-- Navigation Links for Mobile -->
-    <nav v-if="isMenuOpen" :class="$style.navMobile" aria-label="Mobile Navigation">
-      <a
-        @click.prevent="navigateTo('/')"
-        href="javascript:void(0);"
-        :class="$style.navMobileLink"
+    <nav v-if="isMenuOpen" class="navMobile" aria-label="Mobile Navigation">
+      <router-link
+        to="/"
+        class="navMobileLink"
+        @click="closeMenu"
       >
         Trang chủ
-      </a>
-      <div :class="$style.dropdownMobile" ref="mobileDropdown">
+      </router-link>
+      <div class="dropdownMobile" ref="mobileDropdown">
         <button
-          :class="$style.dropdownMobileButton"
+          class="dropdownMobileButton"
           aria-haspopup="true"
           :aria-expanded="isMobileDropdownOpen ? 'true' : 'false'"
           @click="toggleMobileDropdown"
@@ -157,60 +188,62 @@
           Sản phẩm ▼
         </button>
         <div
-          :class="[$style.dropdownMobileContent, { [$style.show]: isMobileDropdownOpen }]"
+          class="dropdownMobileContent"
+          :class="{ show: isMobileDropdownOpen }"
           role="menu"
         >
-          <a
-            @click.prevent="navigateTo('/smartwatches')"
-            href="javascript:void(0);"
-            :class="$style.dropdownMobileItem"
+          <router-link
+            to="/smartwatches"
+            class="dropdownMobileItem"
             role="menuitem"
+            @click="closeMobileMenu"
           >
             Đồng hồ thông minh
-          </a>
-          <a
-            @click.prevent="navigateTo('/luxury-watches')"
-            href="javascript:void(0);"
-            :class="$style.dropdownMobileItem"
+          </router-link>
+          <router-link
+            to="/luxury-watches"
+            class="dropdownMobileItem"
             role="menuitem"
+            @click="closeMobileMenu"
           >
             Đồng hồ cao cấp
-          </a>
-          <a
-            @click.prevent="navigateTo('/accessories')"
-            href="javascript:void(0);"
-            :class="$style.dropdownMobileItem"
+          </router-link>
+          <router-link
+            to="/accessories"
+            class="dropdownMobileItem"
             role="menuitem"
+            @click="closeMobileMenu"
           >
             Phụ kiện
-          </a>
+          </router-link>
         </div>
       </div>
 
-      <a
-        @click.prevent="navigateTo('/promo')"
-        href="javascript:void(0);"
-        :class="$style.navMobileLink"
+      <router-link
+        to="/promo"
+        class="navMobileLink"
+        @click="closeMenu"
       >
         Khuyến mãi
-      </a>
-      <a
-        @click.prevent="navigateTo('/blog')"
-        href="javascript:void(0);"
-        :class="$style.navMobileLink"
+      </router-link>
+      <router-link
+        to="/blog"
+        class="navMobileLink"
+        @click="closeMenu"
       >
         Blog
-      </a>
-      <a
-        @click.prevent="navigateTo('/contact')"
-        href="javascript:void(0);"
-        :class="$style.navMobileLink"
+      </router-link>
+      <router-link
+        to="/contact"
+        class="navMobileLink"
+        @click="closeMenu"
       >
         Liên hệ
-      </a>
+      </router-link>
     </nav>
   </header>
 </template>
+
 
 <script>
 export default {
@@ -223,61 +256,208 @@ export default {
   },
   data() {
     return {
-      searchQuery: "",
-      isMenuOpen: false,
-      isDropdownOpen: false,
-      isMobileDropdownOpen: false,
+      searchQuery: "", // Query tìm kiếm
+      isMenuOpen: false, // Trạng thái mở menu chính
+      isDropdownOpen: false, // Trạng thái mở dropdown sản phẩm
+      isMobileDropdownOpen: false, // Trạng thái mở dropdown sản phẩm trên mobile
+      isUserDropdownOpen: false, // Trạng thái mở dropdown người dùng
+      currentUser: JSON.parse(localStorage.getItem("currentUser")) || null, // Lưu thông tin người dùng đã đăng nhập
     };
   },
-  methods: {
-    search() {
-      this.$router.push({ path: '/search', query: { q: this.searchQuery } });
+  // created() {
+  //   console.log(this.currentUser);
+  // },
+  computed: {
+    isAuthenticated() {
+      return !!this.currentUser; // Kiểm tra xem người dùng đã đăng nhập hay chưa
     },
+  },
+  methods: {
+    // Tìm kiếm sản phẩm
+    search() {
+      if (this.searchQuery.trim() !== "") {
+        this.$router.push({ path: "/search", query: { q: this.searchQuery } });
+        this.searchQuery = ""; // Reset ô tìm kiếm
+      }
+    },
+
+    // Đăng xuất người dùng
+    logoutUser() {
+      localStorage.removeItem("currentUser"); // Xóa thông tin người dùng khỏi localStorage
+      localStorage.removeItem("authUser");
+      this.currentUser = null; // Xóa trạng thái người dùng
+      this.isUserDropdownOpen = false; // Đóng dropdown người dùng
+      // this.$router.push("/"); // Điều hướng về trang chủ
+      alert("Bạn đã đăng xuất thành công!");
+      window.location.href = '/';
+    },
+
+    // Điều hướng đến các trang khác
+    navigateTo(route) {
+      this.$router.push(route);
+      this.closeAllDropdowns(); // Đóng tất cả dropdowns
+    },
+
+    // Điều hướng về trang chủ
+    navigateHome() {
+      this.$router.push("/");
+    },
+
+    // Đóng tất cả dropdowns
+    closeAllDropdowns() {
+      this.isDropdownOpen = false;
+      this.isMobileDropdownOpen = false;
+      this.isUserDropdownOpen = false;
+    },
+
+    // Toggle menu chính
     toggleMenu() {
       this.isMenuOpen = !this.isMenuOpen;
       if (!this.isMenuOpen) {
         this.isMobileDropdownOpen = false;
       }
     },
+
+    // Toggle dropdown sản phẩm
     toggleDropdown() {
       this.isDropdownOpen = !this.isDropdownOpen;
     },
+
+    // Toggle dropdown sản phẩm trên mobile
     toggleMobileDropdown() {
       this.isMobileDropdownOpen = !this.isMobileDropdownOpen;
     },
-    navigateHome() {
-      this.$router.push('/');
+
+    // Toggle dropdown người dùng
+    toggleUserDropdown() {
+      this.isUserDropdownOpen = !this.isUserDropdownOpen;
     },
-    navigateTo(route) {
-      this.$router.push(route);
-      this.isDropdownOpen = false;
-      this.isMobileDropdownOpen = false;
-    },
-    toggleCart() {
-      this.$emit("toggle-cart");
-    },
+
+    // Xử lý khi click ngoài các dropdowns
     handleClickOutside(event) {
       const dropdown = this.$refs.dropdown;
       const mobileDropdown = this.$refs.mobileDropdown;
+      const userDropdown = this.$refs.userDropdown;
+
       if (dropdown && !dropdown.contains(event.target)) {
         this.isDropdownOpen = false;
       }
       if (mobileDropdown && !mobileDropdown.contains(event.target)) {
         this.isMobileDropdownOpen = false;
       }
+      if (userDropdown && !userDropdown.contains(event.target)) {
+        this.isUserDropdownOpen = false;
+      }
+    },
+
+    // Xử lý khi toggle giỏ hàng
+    toggleCart() {
+      this.$emit("toggle-cart");
     },
   },
   mounted() {
+    // Gắn sự kiện click bên ngoài để đóng dropdowns
     document.addEventListener("click", this.handleClickOutside);
   },
   beforeUnmount() {
+    // Gỡ sự kiện khi component bị hủy
     document.removeEventListener("click", this.handleClickOutside);
   },
 };
 </script>
 
+<style scoped>
 
-<style module>
+/* styles.css hoặc trong <style scoped> của component */
+
+/* Nút Đăng xuất */
+.logout {
+  background-color: #e74c3c; /* Màu đỏ nổi bật */
+  color: #ffffff; /* Chữ màu trắng */
+  padding: 10px 16px; /* Khoảng cách bên trong nút */
+  font-size: 0.9rem; /* Kích thước chữ */
+  font-weight: 600; /* Độ đậm chữ */
+  border: none; /* Loại bỏ viền mặc định */
+  border-radius: 8px; /* Bo góc mượt mà */
+  cursor: pointer; /* Con trỏ dạng tay khi hover */
+  transition: all 0.3s ease; /* Hiệu ứng chuyển đổi */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+  text-align: center; /* Căn giữa nội dung */
+}
+
+/* Hiệu ứng khi hover */
+.logout:hover {
+  background-color: #c0392b; /* Màu đỏ sẫm hơn khi hover */
+  transform: translateY(-2px); /* Hiệu ứng nâng nút */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Tăng độ bóng */
+}
+
+/* Hiệu ứng khi nhấn */
+.logout:active {
+  transform: translateY(0); /* Đưa nút về vị trí gốc */
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1); /* Giảm độ bóng */
+  background-color: #a93226; /* Màu đỏ đậm hơn */
+}
+
+/* Hiệu ứng khi focus */
+.logout:focus {
+  outline: 2px solid #ff6f61; /* Đường viền focus màu cam */
+  outline-offset: 2px;
+}
+
+/* Đảm bảo nút đồng bộ với giao diện */
+.logout {
+  margin-left: 10px; /* Khoảng cách với nút "Tài khoản" */
+  display: inline-block;
+  vertical-align: middle; /* Căn chỉnh giữa dòng */
+}
+
+
+/* Router-link styled as a button */
+.button-beautiful {
+  display: inline-block; /* Đảm bảo hiển thị inline */
+  background: linear-gradient(90deg, #6dd5ed, #2193b0); /* Gradient xanh hiện đại */
+  color: #ffffff; /* Chữ màu trắng */
+  padding: 10px 16px; /* Khoảng cách bên trong */
+  font-size: 0.9rem; /* Kích thước chữ */
+  font-weight: 600; /* Đậm chữ */
+  text-align: center; /* Căn giữa chữ */
+  border: none; /* Không có viền */
+  border-radius: 8px; /* Bo góc */
+  cursor: pointer; /* Con trỏ tay khi hover */
+  text-decoration: none; /* Xóa gạch chân của link */
+  transition: all 0.3s ease; /* Hiệu ứng mượt */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+}
+
+/* Hover effect */
+.button-beautiful:hover {
+  background: linear-gradient(90deg, #56c7e5, #18678a); /* Gradient đậm hơn khi hover */
+  transform: translateY(-2px); /* Hiệu ứng nâng lên */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); /* Tăng bóng khi hover */
+}
+
+/* Active effect */
+.button-beautiful:active {
+  background: linear-gradient(90deg, #2193b0, #6dd5ed); /* Gradient đảo ngược */
+  transform: translateY(0); /* Trở về gốc khi nhấn */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Giảm bóng khi nhấn */
+}
+
+/* Focus effect */
+.button-beautiful:focus {
+  outline: 2px solid #ffd54f; /* Đường viền focus vàng nhạt */
+  outline-offset: 2px; /* Khoảng cách viền */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .button-beautiful {
+    padding: 8px 12px; /* Giảm khoảng cách trong nút trên màn hình nhỏ */
+    font-size: 0.85rem; /* Nhỏ hơn chút */
+  }
+}
+
 /* CSS Variables for Consistent Styling */
 :root {
   --primary-color: #003366;
@@ -306,7 +486,9 @@ export default {
   color: var(--text-color);
   padding: 15px 20px;
   box-shadow: 0px 4px 8px var(--shadow-color);
-  position: relative;
+  position: fixed;
+  top: 0;
+  width: 100%;
   z-index: 1000;
   font-family: var(--font-family);
 }
@@ -329,7 +511,6 @@ export default {
   color: var(--secondary-color);
   cursor: pointer;
   transition: color var(--transition-speed);
-  cursor: pointer; 
 }
 
 .logo:hover,
@@ -363,8 +544,10 @@ export default {
 /* Dropdown Menu Styles */
 .dropdown {
   position: relative;
+  display: inline-block;
 }
 
+/* Dropdown Button */
 .dropdownButton {
   background: none;
   border: none;
@@ -374,41 +557,160 @@ export default {
   cursor: pointer;
   display: flex;
   align-items: center;
-  transition: color var(--transition-speed);
+  gap: 8px; /* Khoảng cách giữa icon và text */
+  transition: color var(--transition-speed), transform var(--transition-speed);
 }
 
 .dropdownButton:hover,
 .dropdownButton:focus {
   color: var(--secondary-color);
+  transform: translateY(-2px); /* Hiệu ứng nhấn nút nhẹ */
   outline: none;
 }
 
+/* Dropdown Content Container */
 .dropdownContent {
   display: none;
   position: absolute;
-  background-color: var(--dropdown-bg-color);
-  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
-  min-width: 180px;
-  z-index: 1000;
-  border-radius: 4px;
+  background-color: #003366;
+  box-shadow: 0px 12px 24px rgba(0, 0, 0, 0.25); /* Bóng mờ sâu hơn cho chuyên nghiệp */
+  min-width: 220px; /* Tăng kích thước tối thiểu */
+  z-index: 1100;
+  border-radius: 8px; /* Góc bo mềm mại hơn */
+  top: 100%;
+  left: 0;
+  overflow: hidden;
+  animation: fadeIn 0.25s ease-in-out; /* Hiệu ứng nhanh hơn cho cảm giác mượt */
+  opacity: 0; /* Mặc định ẩn */
+  visibility: hidden; /* Ẩn khỏi trình đọc màn hình khi không hiển thị */
+  transform: translateY(10px); /* Hiệu ứng trượt */
+  transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
 }
 
-.show {
+/* Hiển thị Dropdown khi hover hoặc kích hoạt */
+.dropdown:hover .dropdownContent,
+.dropdownContent.show {
   display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0); /* Hiển thị trượt lên mượt mà */
 }
 
+/* Dropdown Items */
 .dropdownItem {
   color: var(--text-color);
-  padding: 12px 16px;
-  display: block;
+  padding: 14px 18px; /* Khoảng cách rộng rãi hơn */
+  display: flex;
+  align-items: center;
   text-decoration: none;
-  transition: background-color var(--transition-speed);
+  font-size: 15px; /* Kích thước chữ dễ đọc hơn */
+  font-weight: 400;
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+  gap: 10px; /* Khoảng cách giữa icon và text */
 }
 
 .dropdownItem:hover,
 .dropdownItem:focus {
   background-color: var(--dropdown-hover-bg-color);
+  color: var(--secondary-color); /* Đổi màu chữ khi hover */
   outline: none;
+}
+
+/* Icon Styling in Dropdown Items */
+.dropdownItemIcon {
+  font-size: 20px; /* Icon lớn hơn, nổi bật hơn */
+  color: var(--text-color);
+  transition: color var(--transition-speed);
+}
+
+.dropdownItem:hover .dropdownItemIcon {
+  color: var(--secondary-color); /* Icon đổi màu khi hover */
+}
+
+/* Responsive Fixes for Smaller Screens */
+@media (max-width: 768px) {
+  .dropdownContent {
+    min-width: 100%; /* Đảm bảo menu rộng bằng container trên màn hình nhỏ */
+    left: 0;
+    border-radius: 0; /* Loại bỏ bo góc để đồng nhất */
+    animation: slideDown 0.3s ease-in-out; /* Thay đổi hiệu ứng cho màn hình nhỏ */
+  }
+
+  .dropdownItem {
+    padding: 12px 20px;
+  }
+}
+
+/* Slide Down Animation for Mobile Navigation */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation for Dropdown */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Accessibility and Focus State */
+.dropdownButton:focus + .dropdownContent,
+.dropdownContent:focus-within {
+  display: block;
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdownItem:focus {
+  background-color: var(--dropdown-hover-bg-color);
+  color: var(--secondary-color);
+  outline: none;
+}
+
+/* Extra Styling for a Premium Look */
+.dropdownContent::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: 20px;
+  width: 12px;
+  height: 12px;
+  background-color: var(--dropdown-bg-color);
+  transform: rotate(45deg); /* Tạo mũi tên nhỏ trên dropdown */
+  box-shadow: -1px -1px 5px rgba(0, 0, 0, 0.1);
+  z-index: -1;
+}
+
+/* Custom Scrollbar for Dropdown Content */
+.dropdownContent {
+  max-height: 300px; /* Giới hạn chiều cao nếu danh sách dài */
+  overflow-y: auto;
+}
+
+.dropdownContent::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dropdownContent::-webkit-scrollbar-thumb {
+  background-color: var(--secondary-color);
+  border-radius: 10px;
+}
+
+.dropdownContent::-webkit-scrollbar-thumb:hover {
+  background-color: var(--hover-color);
 }
 
 /* Search Bar */
@@ -574,6 +876,10 @@ export default {
   flex-direction: column;
 }
 
+.dropdownMobileContent.show {
+  display: flex;
+}
+
 .dropdownMobileItem {
   padding: 10px 40px;
   color: var(--text-color);
@@ -586,10 +892,6 @@ export default {
 .dropdownMobileItem:focus {
   background-color: var(--dropdown-hover-bg-color);
   outline: none;
-}
-
-.show {
-  display: block;
 }
 
 /* Slide Down Animation for Mobile Navigation */

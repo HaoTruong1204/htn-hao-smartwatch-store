@@ -1,136 +1,132 @@
 // src/router/index.js
 
 import { createRouter, createWebHistory } from 'vue-router';
+import store from '../store'; // Import Vuex Store
+import emitter from '../plugins/eventBus'; // Import Event Bus
 
-// Hàm kiểm tra xác thực người dùng
-export function isAuthenticated() {
-  return !!localStorage.getItem('authToken');
-}
-
-/**
- * Kiểm tra xem người dùng có phải là admin hay không.
- * @returns {boolean} Trạng thái quyền admin.
- */
-export function isAdmin() {
-  return localStorage.getItem('userRole') === 'admin';
-}
-
-// Định nghĩa các route của ứng dụng với Lazy Loading
 const routes = [
   { 
     path: '/', 
     component: () => import('../pages/HomePage.vue'), 
     name: 'Home' 
   },
-
   {
-    path: '/accessories',
-    component: () => import('../pages/Accessories.vue'),
-    name: 'Accessories'
-  }, 
+    path: '/smartwatches',
+    component: () => import('../pages/Smartwatches.vue'),
+    name: 'Smartwatches'
+  },
   { 
     path: '/luxury-watches', 
     component: () => import('../pages/LuxuryWatches.vue'), 
-    name: 'Luxury-Watches' 
+    name: 'LuxuryWatches' 
   },
   { 
-    path: '/smartwatches', 
-    component: () => import('../pages/Smartwatches.vue'), 
-    name: 'Smart-Watches' 
-  },  // Trang chủ
+    path: '/accessories', 
+    component: () => import('../pages/Accessories.vue'), 
+    name: 'Accessories' 
+  },
   { 
-    path: '/products', 
-    component: () => import('../pages/ProductListPage.vue'), 
-    name: 'ProductList' 
-  },  // Danh sách sản phẩm
+    path: '/new-products', 
+    component: () => import('../pages/NewProducts.vue'), 
+    name: 'NewProducts' 
+  },
   { 
     path: '/product/:id', 
     component: () => import('../pages/ProductDetail.vue'), 
     name: 'ProductDetail', 
     props: true 
-  },  // Chi tiết sản phẩm
+  },
   { 
     path: '/cart', 
-    component: () => import('../pages/CartPage.vue'), 
+    component: () => import('../components/cart/ComCartView.vue'), 
     name: 'Cart' 
-  },  // Giỏ hàng
+  },
   { 
     path: '/checkout', 
     component: () => import('../pages/CheckoutPage.vue'), 
     name: 'Checkout' 
-  },  // Thanh toán
+  },
   { 
     path: '/order-history', 
     component: () => import('../pages/OrderHistory.vue'), 
     name: 'OrderHistory',
-    meta: { requiresAuth: true },  // Chỉ cho phép người dùng đã đăng nhập truy cập
+    meta: { requiresAuth: true },  
   },
   { 
     path: '/profile', 
     component: () => import('../pages/UserProfile.vue'), 
     name: 'UserProfile',
-    meta: { requiresAuth: true },  // Chỉ cho phép người dùng đã đăng nhập truy cập
+    meta: { requiresAuth: true },  
   },
-
+  { 
+    path: '/account',
+    component: () => import('../pages/AccountPage.vue'),
+    name: 'Account',
+    meta: { requiresAuth: true },
+  },
   { 
     path: '/login', 
     component: () => import('../pages/LoginPage.vue'), 
     name: 'Login' 
-  },  // Trang đăng nhập
-
-  {
-    path: "/account",
-    component: () => import("../pages/AccountPage.vue"),
-    name: "Account",
-    meta: { requiresAuth: true },
   },
-  
   { 
     path: '/register', 
     component: () => import('../pages/RegisterPage.vue'), 
     name: 'Register' 
-  },  // Trang đăng ký
+  },
   { 
     path: '/contact', 
     component: () => import('../pages/ContactPage.vue'), 
     name: 'Contact' 
-  },  // Trang liên hệ
+  },
   { 
     path: '/about', 
     component: () => import('../pages/AboutPage.vue'), 
     name: 'About' 
-  },  // Trang giới thiệu
+  },
   { 
     path: '/terms', 
     component: () => import('../pages/TermsPage.vue'), 
     name: 'Terms' 
-  },  // Điều khoản dịch vụ
+  },
   { 
     path: '/privacy-policy', 
     component: () => import('../pages/PrivacyPolicyPage.vue'), 
     name: 'PrivacyPolicy' 
-  },  // Chính sách bảo mật
+  },
   { 
     path: '/blog', 
     component: () => import('../pages/BlogListPage.vue'), 
     name: 'BlogList' 
-  },  // Danh sách blog
+  },
   { 
     path: '/blog/:id', 
     component: () => import('../pages/BlogDetailPage.vue'), 
     name: 'BlogDetail', 
     props: true 
-  },  // Chi tiết bài viết blog
+  },
   { 
     path: '/search', 
     component: () => import('../pages/SearchResultsPage.vue'), 
     name: 'SearchResults' 
-  },  // Trang kết quả tìm kiếm
+  },
+  { 
+    path: '/all-products', 
+    component: () => import('../pages/AllProducts.vue'), 
+    name: 'AllProducts' 
+  },
+  { 
+    path: '/order-confirmation/:orderId', 
+    component: () => import('../pages/OrderConfirmation.vue'), 
+    name: 'OrderConfirmation', 
+    props: true,
+    meta: { requiresAuth: true }, 
+  },
   { 
     path: '/:catchAll(.*)', 
     component: () => import('../pages/NotFoundPage.vue'), 
     name: 'NotFound' 
-  }  // Trang 404 cho các đường dẫn không tồn tại
+  }
 ];
 
 // Tạo router với các route đã định nghĩa
@@ -139,20 +135,24 @@ const router = createRouter({
   routes,
 });
 
-// Route guard cho xác thực
+// Route guard để bảo vệ các route yêu cầu xác thực
 router.beforeEach((to, from, next) => {
   console.log('Navigating to:', to.name);
-  console.log('Authenticated:', isAuthenticated());
-  console.log('Admin:', isAdmin());
 
-  if (to.meta.requiresAuth && !isAuthenticated()) {
-    alert('Bạn cần đăng nhập để truy cập trang này.');
+  const isAuthenticated = store.getters.isAuthenticated;
+
+  console.log('Authenticated:', isAuthenticated);
+
+  if (to.meta.requiresAuth && !isAuthenticated) {
+    // Phát thông báo yêu cầu đăng nhập
+    emitter.emit('show-notification', { message: 'Bạn cần đăng nhập để truy cập trang này.', type: 'error' });
     return next({ name: 'Login' });
   }
 
-  if (to.meta.requiresAdmin && !isAdmin()) {
-    alert('Bạn không có quyền truy cập trang này.');
-    return next({ name: 'Home' });
+  // Ngăn người dùng đã đăng nhập truy cập trang "Login" và "Register"
+  if ((to.name === 'Login' || to.name === 'Register') && isAuthenticated) {
+    emitter.emit('show-notification', { message: 'Bạn đã đăng nhập rồi!', type: 'info' });
+    return next({ name: 'Account' }); // Hoặc trang nào bạn muốn chuyển hướng
   }
 
   next();

@@ -1,77 +1,114 @@
+<!-- src/App.vue -->
+
 <template>
   <div id="app">
     <!-- Header với nút Giỏ Hàng hiển thị số lượng sản phẩm -->
     <Header :cartItemCount="cartItemCount" @toggle-cart="toggleCartView" />
 
+    <p style="margin-bottom: 50px;"> </p>
+
     <!-- Nội dung của các route với v-slot để truyền props -->
     <main class="main-content">
-      <router-view v-slot="{ Component }">
-        <component
-          :is="Component"
-          @add-to-cart="addToCart"
-          @remove-item="removeItemFromCart"
-          @clear-cart="clearCart"
-          
-        />
-      </router-view>
+    <router-view v-slot="{ Component }">
+  <component
+    v-if="Component"
+    :is="Component"
+    @add-to-cart="addToCart"
+    @remove-item="removeItemFromCart"
+    @clear-cart="clearCart"
+    @update-quantity="updateQuantity"
+    @navigate="handleNavigate"
+  />
+</router-view>
+
     </main>
 
     <!-- Footer xuất hiện trên tất cả các trang -->
     <Footer />
 
-    <!-- Hiển thị giỏ hàng khi người dùng nhấn vào nút Giỏ Hàng -->
-    <div class="cart-overlay" v-if="showCart" @click="toggleCartView"></div>
+    <!-- Hiển thị giỏ hàng khi người dùng nhấn vào nút Giỏ Hàng hoặc khi thêm sản phẩm -->
+    <div class="cart-overlay" v-if="showCart" @click.self="toggleCartView"></div>
     <ComCartView 
       v-if="showCart" 
-      :cart="cart" 
+      :cart="cartItems" 
+      :cartTotal="cartTotal"
       @remove-item="removeItemFromCart" 
       @clear-cart="clearCart" 
+      @update-quantity="updateQuantity"
       @close-cart="toggleCartView"
+      @navigate="handleNavigate"
       class="com-cart-view"
     />
+
+    <!-- Component Notification -->
+    <Notification ref="notification" />
   </div>
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { computed, ref, onMounted, onUnmounted } from 'vue';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
 import Header from './components/compo/ComHeader.vue';
 import Footer from './components/compo/ComFooter.vue';
-import ComCartView from './components/compo/ComCartView.vue';
+import ComCartView from './components/cart/ComCartView.vue';
+import Notification from './components/Notification.vue';
+import emitter from './plugins/eventBus'; // Giả sử bạn đã cài đặt Event Bus
 
 export default {
   name: 'App',
-
   components: {
     Header,
     Footer,
     ComCartView,
-    
+    Notification,
   },
-
   setup() {
-    // Quản lý trạng thái giỏ hàng cục bộ
-    const cart = ref([]);
+    const store = useStore();
+    const router = useRouter();
+
+    // Quản lý trạng thái hiển thị giỏ hàng
     const showCart = ref(false);
 
-    // Tính toán số lượng sản phẩm trong giỏ hàng
-    const cartItemCount = computed(() => cart.value.length);
+    // Lấy số lượng sản phẩm trong giỏ hàng từ Vuex
+    const cartItemCount = computed(() => store.getters.cartItemCount);
 
-    // Thêm sản phẩm vào giỏ hàng
+    // Lấy danh sách sản phẩm trong giỏ hàng từ Vuex
+    const cartItems = computed(() => store.getters.cart);
+
+    // Lấy tổng giá trị giỏ hàng từ Vuex
+    const cartTotal = computed(() => store.getters.cartTotal);
+
+    // Thêm sản phẩm vào giỏ hàng thông qua Vuex và hiển thị giỏ hàng
     const addToCart = (product) => {
-      cart.value.push(product);
+      store.dispatch('addToCart', product);
+      // Hiển thị thông báo (giả sử bạn có Notification component)
+      emitter.emit('show-notification', { message: `Đã thêm "${product.name}" vào giỏ hàng!`, type: 'success' });
+      // Hiển thị giỏ hàng khi thêm sản phẩm
+      showCart.value = true;
     };
 
-    // Xóa sản phẩm khỏi giỏ hàng
-    const removeItemFromCart = (product) => {
-      const index = cart.value.findIndex((item) => item.id === product.id);
-      if (index !== -1) {
-        cart.value.splice(index, 1);
-      }
+    // Xóa sản phẩm khỏi giỏ hàng thông qua Vuex
+    const removeItemFromCart = (productId) => {
+      store.dispatch('removeFromCart', productId);
+      emitter.emit('show-notification', { message: 'Đã xóa sản phẩm khỏi giỏ hàng.', type: 'info' });
     };
 
-    // Xóa toàn bộ giỏ hàng
+    // Xóa toàn bộ giỏ hàng thông qua Vuex
     const clearCart = () => {
-      cart.value = [];
+      store.dispatch('clearCart');
+      emitter.emit('show-notification', { message: 'Giỏ hàng đã được xóa.', type: 'info' });
+    };
+
+    // Cập nhật số lượng sản phẩm trong giỏ hàng thông qua Vuex
+    const updateQuantity = ({ itemId, quantity }) => {
+      if (quantity < 1) {
+        quantity = 1;
+      }
+      store.dispatch('updateCartQuantity', { itemId, quantity });
+      const item = store.state.cart.find(item => item.id === itemId);
+      const itemName = item ? item.name : '';
+      emitter.emit('show-notification', { message: `Đã cập nhật số lượng "${itemName}" thành ${quantity}.`, type: 'info' });
     };
 
     // Hiển thị hoặc ẩn giỏ hàng
@@ -79,14 +116,40 @@ export default {
       showCart.value = !showCart.value;
     };
 
+    // Xử lý điều hướng từ các component con
+    const handleNavigate = (route) => {
+      router.push(`/${route}`);
+    };
+
+    // Quản lý thông báo
+    const notification = ref(null);
+
+    const handleNotification = ({ message, type }) => {
+      if (notification.value) {
+        notification.value.show(message, type);
+      }
+    };
+
+    onMounted(() => {
+      emitter.on('show-notification', handleNotification);
+    });
+
+    onUnmounted(() => {
+      emitter.off('show-notification', handleNotification);
+    });
+
     return {
-      cart,
-      cartItemCount,
       showCart,
-      toggleCartView,
+      cartItemCount,
+      cartItems,
+      cartTotal,
       addToCart,
       removeItemFromCart,
       clearCart,
+      updateQuantity,
+      toggleCartView,
+      handleNavigate,
+      notification,
     };
   },
 };
@@ -163,4 +226,7 @@ export default {
     width: 100%;
   }
 }
+
+/* Notification Styles */
+/* Giả sử bạn có CSS cho Notification component */
 </style>

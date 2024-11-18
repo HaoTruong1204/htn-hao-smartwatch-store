@@ -1,33 +1,58 @@
-<template>
-  <div class="product-detail">
-    <img :src="product.image" alt="Product Image" class="product-image" />
-    <div class="product-info">
-      <h1 class="product-name">{{ product.name }}</h1>
-      <p class="product-price">{{ formatCurrency(product.price) }}</p>
-      <p class="product-description">{{ product.description }}</p>
-      <button @click="addToCart(product)" class="add-to-cart-button">Thêm vào giỏ hàng</button>
-    </div>
-  </div>
-</template>
-
 <script>
+import { fetchItemById } from '../services/api'; // Đảm bảo import đúng từ api.js
+import { useStore } from 'vuex'; // Sử dụng Composition API
+import { computed, ref } from 'vue';
+
 export default {
+  name: "ProductDetail",
   props: {
-    product: {
-      type: Object,
+    id: {
+      type: String,
       required: true,
     },
   },
-  methods: {
-    formatCurrency(value) {
-      return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value);
-    },
-    addToCart(product) {
-      this.$store.dispatch('cart/addToCart', product);
-    },
+  setup(props) {
+    const store = useStore();
+    const product = ref(null);
+    const loading = ref(true);
+    const error = ref(null);
+
+    const fetchProduct = async () => {
+      try {
+        const data = await fetchItemById(props.id); // Gọi hàm dịch vụ để lấy dữ liệu sản phẩm
+        product.value = data;
+      } catch (err) {
+        error.value = 'Không thể tải thông tin sản phẩm.';
+        console.error('Lỗi khi lấy dữ liệu từ API:', err);
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    const formatPrice = (price) => {
+      return price.toLocaleString('vi-VN');
+    };
+
+    const addToCart = () => {
+      if (product.value && product.value.stock > 0) {
+        store.dispatch('addToCart', product.value);
+        alert(`Đã thêm "${product.value.name}" vào giỏ hàng!`);
+      }
+    };
+
+    fetchProduct();
+
+    return {
+      product,
+      loading,
+      error,
+      formatPrice,
+      addToCart,
+    };
   },
 };
 </script>
+
 
 <style scoped>
 /* Container for the product details */

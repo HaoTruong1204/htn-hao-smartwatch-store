@@ -1,147 +1,303 @@
 <template>
-    <div :class="$style.pageContainer">
-      <h1 :class="$style.title">Đồng Hồ Thông Minh</h1>
-      <div :class="$style.productGrid">
-        <div
-          v-for="product in products"
+  <div class="smartwatches-page">
+    <!-- Header Section -->
+    <header class="smartwatches-header">
+      <h1 class="smartwatches-title">Đồng Hồ Thông Minh</h1>
+      <input
+        type="text"
+        v-model="searchQuery"
+        @input="filterProducts"
+        placeholder="Tìm kiếm đồng hồ thông minh..."
+        class="search-input"
+        aria-label="Tìm kiếm đồng hồ thông minh"
+      />
+    </header>
+
+    <!-- Products List Section -->
+    <section class="smartwatches-section">
+      <div class="products-list">
+        <ProductCard
+          v-for="product in paginatedProducts"
           :key="product.id"
-          :class="$style.productCard"
-        >
-          <img :src="product.image" :alt="product.name" :class="$style.productImage" />
-          <h2 :class="$style.productName">{{ product.name }}</h2>
-          <p :class="$style.productPrice">{{ formatCurrency(product.price) }}</p>
-          <button
-            @click="addToCart(product)"
-            :class="$style.addToCartButton"
-          >
-            Thêm vào giỏ
-          </button>
-        </div>
+          :product="product"
+          @add-to-cart="addToCart"
+          @product-clicked="openModal"
+        />
       </div>
+
+      <!-- Pagination Controls -->
+      <div class="pagination-controls" aria-label="Phân trang">
+        <button
+          :disabled="currentPage === 1"
+          @click="changePage(currentPage - 1)"
+          class="pagination-button"
+          aria-label="Trang trước"
+        >
+          &laquo;
+        </button>
+        <button
+          v-for="page in totalPages"
+          :key="page"
+          @click="changePage(page)"
+          :class="{ 'active': currentPage === page }"
+          class="pagination-button"
+          :aria-current="currentPage === page ? 'page' : false"
+        >
+          {{ page }}
+        </button>
+        <button
+          :disabled="currentPage === totalPages"
+          @click="changePage(currentPage + 1)"
+          class="pagination-button"
+          aria-label="Trang sau"
+        >
+          &raquo;
+        </button>
+      </div>
+    </section>
+
+    <!-- Modal sản phẩm -->
+    <ProductModal
+      v-if="selectedProduct"
+      :product="selectedProduct"
+      @close="closeModal"
+      @add-to-cart="addToCart"
+    />
+
+    <!-- Loading and Error Messages -->
+    <div v-if="loading" class="loading-message">
+      Đang tải đồng hồ thông minh...
     </div>
-  </template>
-  
-  <script>
-  export default {
-    name: "Smart-watches",
-    data() {
-      return {
-        products: [
-          {
-            id: 1,
-            name: "Apple Watch Series 8",
-            price: 2000000,
-            image: "https://example.com/apple-watch-series-8.jpg",
-          },
-          {
-            id: 2,
-            name: "Samsung Galaxy Watch 5",
-            price: 7990000,
-            image: "https://example.com/galaxy-watch-5.jpg",
-          },
-          {
-            id: 3,
-            name: "Garmin Venu 2",
-            price: 12990000,
-            image: "https://example.com/garmin-venu-2.jpg",
-          },
-          {
-            id: 4,
-            name: "Fitbit Versa 4",
-            price: 5490000,
-            image: "https://example.com/fitbit-versa-4.jpg",
-          },
-        ],
-      };
+    <div v-if="error" class="error-message">
+      {{ error }}
+    </div>
+  </div>
+</template>
+
+<script>
+import ProductCard from "../components/ProductCard.vue";
+import ProductModal from "../components/product/ProductModal.vue";
+import { fetchSmartwatches } from '../services/productService'; // Import hàm dịch vụ
+import { mapActions } from 'vuex'; // Nếu bạn sử dụng Vuex
+
+export default {
+  name: "Smartwatches",
+  components: { ProductCard, ProductModal },
+  data() {
+    return {
+      products: [],
+      filteredProducts: [],
+      selectedProduct: null, // Sản phẩm được chọn để hiển thị trong modal
+      currentPage: 1,
+      itemsPerPage: 8,
+      searchQuery: '',
+      loading: true,
+      error: null,
+    };
+  },
+  computed: {
+    totalPages() {
+      return Math.ceil(this.filteredProducts.length / this.itemsPerPage);
     },
-    methods: {
-      formatCurrency(amount) {
-        return new Intl.NumberFormat("vi-VN", {
-          style: "currency",
-          currency: "VND",
-        }).format(amount);
-      },
-      addToCart(product) {
-        alert(`Đã thêm "${product.name}" vào giỏ hàng.`);
-        // Logic thêm vào giỏ hàng
-        this.$emit("add-to-cart", product);
-      },
+    paginatedProducts() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      const end = start + this.itemsPerPage;
+      return this.filteredProducts.slice(start, end);
     },
-  };
-  </script>
-  
-  <style module>
-  .pageContainer {
-    padding: 20px;
-    font-family: Arial, sans-serif;
-  }
-  
-  .title {
-    text-align: center;
+  },
+  methods: {
+    ...mapActions(['addProductToCart']), // Nếu bạn sử dụng Vuex
+    async fetchSmartwatchesData() {
+      try {
+        const data = await fetchSmartwatches(); // Gọi hàm dịch vụ để lấy dữ liệu
+        this.products = data;
+        this.filteredProducts = data;
+      } catch (error) {
+        this.error = 'Không thể tải dữ liệu đồng hồ thông minh.';
+        console.error('Lỗi khi lấy dữ liệu từ API:', error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    changePage(page) {
+      if (page >= 1 && page <= this.totalPages) {
+        this.currentPage = page;
+        this.$nextTick(() => {
+          this.scrollToTop();
+        });
+      }
+    },
+    scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
+    },
+    addToCart(product) {
+      // Sử dụng Vuex để thêm sản phẩm vào giỏ hàng
+      this.addProductToCart(product);
+      // Hiển thị thông báo cho người dùng (có thể sử dụng Toast hoặc Snackbar)
+      alert(`Đã thêm "${product.name}" vào giỏ hàng!`);
+    },
+    openModal(product) {
+      this.selectedProduct = product;
+      document.body.classList.add('modal-open'); // Thêm lớp khi modal mở
+    },
+    closeModal() {
+      this.selectedProduct = null;
+      document.body.classList.remove('modal-open'); // Loại bỏ lớp khi modal đóng
+    },
+    filterProducts() {
+      if (this.searchQuery.trim() === '') {
+        this.filteredProducts = this.products;
+      } else {
+        const query = this.searchQuery.trim().toLowerCase();
+        this.filteredProducts = this.products.filter(product =>
+          product.name.toLowerCase().includes(query)
+        );
+      }
+      this.currentPage = 1; // Reset trang khi lọc
+    },
+  },
+  mounted() {
+    this.fetchSmartwatchesData(); // Gọi API khi trang được tải
+  },
+};
+</script>
+
+<style scoped>
+:root {
+  --primary-color: #003366;
+  --secondary-color: #ffcc00;
+  --hover-color: #ffd54f;
+  --text-color: #333333;
+  --background-color: #f4f6f9;
+  --font-family: 'Roboto', sans-serif;
+  --transition-speed: 0.3s;
+}
+
+.smartwatches-page {
+  font-family: var(--font-family);
+  background-color: var(--background-color);
+  padding: 20px;
+}
+
+.smartwatches-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.smartwatches-title {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 400px;
+  padding: 10px 15px;
+  margin-top: 20px;
+  font-size: 1rem;
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+  transition: border-color var(--transition-speed);
+}
+
+.search-input:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+.smartwatches-section {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.products-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  gap: 8px;
+}
+
+.pagination-button {
+  padding: 8px 12px;
+  font-size: 1rem;
+  color: var(--primary-color);
+  background-color: #e0e0e0;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.pagination-button.active {
+  background-color: var(--primary-color);
+  color: white;
+  font-weight: bold;
+}
+
+.pagination-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.pagination-button:hover:not(:disabled),
+.pagination-button:focus:not(:disabled) {
+  background-color: #d3d3d3;
+  outline: none;
+}
+
+.loading-message,
+.error-message {
+  text-align: center;
+  font-size: 1.2rem;
+  color: var(--text-color);
+  margin-top: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .smartwatches-title {
     font-size: 2rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #333;
   }
-  
-  .productGrid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
+
+  .products-list {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
   }
-  
-  .productCard {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    overflow: hidden;
-    background-color: #fff;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+
+  .pagination-button {
+    padding: 6px 10px;
+    font-size: 0.9rem;
   }
-  
-  .productCard:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 576px) {
+  .smartwatches-title {
+    font-size: 1.8rem;
   }
-  
-  .productImage {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    border-bottom: 1px solid #ddd;
+
+  .products-list {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
   }
-  
-  .productName {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #555;
-    margin: 10px;
-    text-align: center;
+
+  .pagination-button {
+    padding: 5px 8px;
+    font-size: 0.8rem;
   }
-  
-  .productPrice {
-    font-size: 1rem;
-    color: #ff5722;
-    margin: 0 10px 10px;
-    text-align: center;
-  }
-  
-  .addToCartButton {
-    display: block;
-    margin: 10px auto 15px;
-    padding: 10px 15px;
-    font-size: 1rem;
-    font-weight: bold;
-    color: #fff;
-    background-color: #007bff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
-  
-  .addToCartButton:hover {
-    background-color: #0056b3;
-  }
-  </style>
-  
+}
+
+/* Prevent Body Scroll When Modal is Open */
+body.modal-open {
+  overflow: hidden;
+}
+</style>

@@ -1,9 +1,16 @@
 // src/main.js
+
 import { createApp } from 'vue';
 import App from './App.vue';
-import router from './router';  // Đảm bảo router được import chính xác
+import store from './store';
+import router from './router';
+import Notification from './components/Notification.vue'; // Component Notification
 
-// Tạo ứng dụng Vue và cài đặt router
 const app = createApp(App);
-app.use(router); // Sử dụng router
-app.mount('#app'); // Gắn ứng dụng vào #app trong index.html
+
+app.use(store);
+app.use(router);
+
+app.component('Notification', Notification); // Đăng ký component Notification
+
+app.mount('#app');

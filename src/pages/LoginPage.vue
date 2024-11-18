@@ -1,3 +1,5 @@
+<!-- src/pages/LoginPage.vue -->
+
 <template>
   <div class="login-page">
     <div class="login-container">
@@ -7,6 +9,7 @@
         <div class="form-group">
           <label for="email">Email</label>
           <div class="input-wrapper">
+            <i class="fas fa-envelope"></i>
             <input
               id="email"
               v-model="email"
@@ -17,13 +20,16 @@
               :class="{ 'is-invalid': emailError }"
             />
           </div>
-          <span v-if="emailError" class="error">{{ emailError }}</span>
+          <transition name="fade">
+            <span v-if="emailError" class="error">{{ emailError }}</span>
+          </transition>
         </div>
 
         <!-- Password Field -->
         <div class="form-group">
           <label for="password">Mật khẩu</label>
           <div class="input-wrapper">
+            <i class="fas fa-lock"></i>
             <input
               id="password"
               v-model="password"
@@ -40,7 +46,9 @@
               title="Hiển thị/Ẩn mật khẩu"
             ></i>
           </div>
-          <span v-if="passwordError" class="error">{{ passwordError }}</span>
+          <transition name="fade">
+            <span v-if="passwordError" class="error">{{ passwordError }}</span>
+          </transition>
         </div>
 
         <!-- Submit Button -->
@@ -57,13 +65,16 @@
         </p>
 
         <!-- Error Message -->
-        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+        <transition name="fade">
+          <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+        </transition>
       </form>
     </div>
   </div>
 </template>
 <script>
-import axios from "axios";
+import { mapActions, mapGetters } from 'vuex';
+import emitter from '../plugins/eventBus'; // Import Event Bus nếu cần
 
 export default {
   name: "LoginPage",
@@ -75,10 +86,14 @@ export default {
       errorMessage: "",
       emailError: "",
       passwordError: "",
-      showPassword: false, // Toggle mật khẩu
+      showPassword: false,
     };
   },
+  computed: {
+    ...mapGetters(['isAuthenticated']),
+  },
   methods: {
+    ...mapActions(['login', 'showNotification']),
     validateEmail() {
       if (!this.email) {
         this.emailError = "Email là bắt buộc.";
@@ -100,7 +115,7 @@ export default {
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword;
     },
-    async handleLogin() {
+    handleLogin() {
       this.validateEmail();
       this.validatePassword();
 
@@ -111,165 +126,229 @@ export default {
       this.isLoading = true;
       this.errorMessage = "";
 
-      try {
-        const response = await axios.post("/api/login", {
-          email: this.email,
-          password: this.password,
-        });
+      // Giả định thời gian xử lý đăng nhập
+      setTimeout(() => {
+        try {
+          // Lấy danh sách người dùng từ localStorage
+          const users = JSON.parse(localStorage.getItem("users")) || [];
 
-        if (response.status === 200) {
-          // Lưu token vào localStorage (nếu cần)
-          localStorage.setItem("authToken", response.data.token);
+          // Tìm người dùng theo email
+          const user = users.find(
+            (u) => u.email.toLowerCase() === this.email.toLowerCase()
+          );
 
-          // Điều hướng về trang chủ
-          this.$router.push("/");
-        } else {
-          this.errorMessage = "Email hoặc mật khẩu không chính xác.";
+          if (user && user.password === this.password) {
+            // Gọi action login từ Vuex Store
+            this.login(user);
+
+            localStorage.setItem('currentUser', JSON.stringify(user));
+
+            // Phát thông báo thành công
+            this.showNotification({ message: `Chào mừng, ${user.name}!`, type: 'success' });
+
+            // Chuyển hướng người dùng đến trang chủ
+            // this.$router.push({ name: "Home" });
+            window.location.href = '/';
+          } else {
+            this.errorMessage = "Email hoặc mật khẩu không chính xác.";
+            // Phát thông báo lỗi
+            this.showNotification({ message: "Email hoặc mật khẩu không chính xác.", type: 'error' });
+          }
+        } catch (error) {
+          this.errorMessage = "Đã xảy ra lỗi. Vui lòng thử lại.";
+          console.error("Login Error:", error);
+          // Phát thông báo lỗi
+          this.showNotification({ message: "Đã xảy ra lỗi. Vui lòng thử lại.", type: 'error' });
+        } finally {
+          this.isLoading = false;
         }
-      } catch (error) {
-        this.errorMessage =
-          error.response?.data?.message || "Đã xảy ra lỗi. Vui lòng thử lại.";
-      } finally {
-        this.isLoading = false;
-      }
+      }, 1000); // Giả lập thời gian xử lý 1 giây
     },
+  },
+  mounted() {
+    // Kiểm tra xem người dùng đã đăng nhập hay chưa
+    if (this.isAuthenticated) {
+      this.$router.push({ name: "Home" });
+      this.showNotification({ message: "Bạn đã đăng nhập rồi!", type: 'info' });
+    }
   },
 };
 </script>
-
 <style scoped>
+/* Tổng thể trang đăng nhập */
 .login-page {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 80vh;
-  background-color: #f5f7fa;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #74ebd5, #acb6e5); /* Gradient màu xanh dương nhẹ nhàng */
+  font-family: 'Poppins', sans-serif; /* Font chữ sang trọng */
+  padding: 20px;
 }
 
+/* Container chính */
 .login-container {
-  background-color: #ffffff;
-  padding: 40px 30px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2); /* Đổ bóng nhẹ */
+  max-width: 450px;
   width: 100%;
-  max-width: 400px;
-}
-
-.login-container h2 {
   text-align: center;
-  color: #003366;
-  margin-bottom: 20px;
+  animation: fadeInUp 0.8s ease;
 }
 
+/* Hiệu ứng xuất hiện */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tiêu đề */
+h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #003366; /* Màu xanh đậm sang trọng */
+  margin-bottom: 25px;
+}
+
+/* Form group */
 .form-group {
   margin-bottom: 20px;
   position: relative;
+  text-align: left;
 }
 
-.form-group label {
-  display: block;
-  margin-bottom: 8px;
-  color: #333333;
+/* Label */
+label {
+  font-size: 14px;
   font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+  display: block;
 }
 
-.input-wrapper {
-  position: relative;
-}
-
-.input-wrapper i {
-  position: absolute;
-  top: 50%;
-  left: 15px;
-  transform: translateY(-50%);
-  color: #999999;
-}
-
-.form-group input {
+/* Input */
+input {
   width: 100%;
-  padding: 12px 15px 12px 45px;
-  border: 1px solid #cccccc;
-  border-radius: 4px;
-  transition: border-color 0.3s, box-shadow 0.3s;
-  font-size: 16px;
-  background-color: #fdfdfd;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: 0.3s;
+  background-color: #f8fafc; /* Nền trắng nhẹ */
+  color: #333;
 }
 
-.form-group input:focus {
-  border-color: #ffcc00;
-  box-shadow: 0 0 5px rgba(255, 204, 0, 0.5);
+/* Hiệu ứng khi focus */
+input:focus {
+  border-color: #74ebd5; /* Màu xanh gradient */
+  box-shadow: 0 4px 12px rgba(116, 235, 213, 0.3); /* Đổ bóng tinh tế */
   outline: none;
 }
 
-.form-group input.is-invalid {
-  border-color: #e74c3c;
+/* Input khi có lỗi */
+input.is-invalid {
+  border-color: #e74c3c; /* Màu đỏ lỗi */
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
 }
 
+/* Toggle mật khẩu */
 .toggle-password {
   position: absolute;
   top: 50%;
   right: 15px;
   transform: translateY(-50%);
-  color: #999999;
+  color: #bbb;
+  font-size: 18px;
   cursor: pointer;
+  transition: color 0.3s ease;
 }
 
 .toggle-password:hover {
-  color: #333333;
+  color: #555;
 }
 
+/* Lỗi */
 .error {
   color: #e74c3c;
-  font-size: 14px;
+  font-size: 12px;
   margin-top: 5px;
+  animation: fadeIn 0.3s ease;
 }
 
+/* Nút đăng nhập */
 button {
   width: 100%;
-  padding: 12px;
-  background-color: #ffcc00;
-  color: #003366;
+  padding: 14px;
+  background: linear-gradient(135deg, #74ebd5, #acb6e5); /* Màu gradient nút */
+  color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
+/* Hiệu ứng hover nút */
 button:hover {
-  background-color: #ffd54f;
+  background: linear-gradient(135deg, #6bd2c1, #a5b6e0); /* Gradient đậm hơn */
   transform: translateY(-2px);
 }
 
+/* Nút khi disabled */
 button:disabled {
-  background-color: #cccccc;
+  background: #ccc;
   cursor: not-allowed;
 }
 
+/* Link đến trang đăng ký */
 .register-link {
-  text-align: center;
-  margin-top: 15px;
-  color: #555555;
+  margin-top: 20px;
+  font-size: 14px;
+  color: #555;
 }
 
 .register-link a {
-  color: #ffcc00;
-  text-decoration: none;
+  color: #74ebd5;
   font-weight: bold;
+  text-decoration: none;
+  transition: color 0.3s ease;
 }
 
 .register-link a:hover {
+  color: #acb6e5;
   text-decoration: underline;
 }
 
+/* Thông báo lỗi */
 .error-message {
-  margin-top: 20px;
-  padding: 15px;
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-  border-radius: 4px;
+  margin-top: 15px;
+  padding: 12px 16px;
+  background: rgba(231, 76, 60, 0.1);
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+  border-radius: 8px;
   text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* Hiệu ứng cho thông báo */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

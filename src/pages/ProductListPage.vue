@@ -1,93 +1,98 @@
 <template>
-  <div class="product-list-page">
-    <h1>Chào mừng đến với cửa hàng HTN HAO</h1>
-    
-    <!-- Component lọc sản phẩm -->
-    <ProductFilter @filter="applyFilter" />
-
-    <!-- Hiển thị danh sách sản phẩm sau khi lọc -->
-    <div class="products">
-      <ProductCard
-        v-for="product in filteredProducts"
-        :key="product.id"
-        :product="product"
-        @add-to-cart="addToCart"
-      />
+  <div class="product-list">
+    <h1>Cửa Hàng Đồng Hồ</h1>
+    <div v-if="loading">Đang tải dữ liệu...</div>
+    <div v-else>
+      <div v-if="error" class="error">{{ error }}</div>
+      <div v-else class="products">
+        <div v-for="product in products" :key="product.id" class="product-card">
+          <img :src="product.image" :alt="product.name" class="product-image" />
+          <h2>{{ product.name }}</h2>
+          <p>{{ product.description }}</p>
+          <p><strong>Giá:</strong> {{ formatPrice(product.price) }}</p>
+          <p><strong>Tình trạng:</strong> {{ product.status }}</p>
+          <p><strong>Thêm:</strong> {{ product.additionalInfo }}</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-// Import các component con
-import ProductCard from "../components/product/ProductCard.vue";
-import ProductFilter from "../components/product/ProductFilter.vue";
-// Import dữ liệu sản phẩm từ item.js
-import { items } from "../data/item.js";
+import axios from 'axios';
 
 export default {
-  name: "ProductListPage",
-  components: { ProductCard, ProductFilter },
+  name: 'ProductList',
   data() {
     return {
-      products: items, // Danh sách sản phẩm ban đầu từ items.js
-      filteredProducts: items, // Sản phẩm sau khi lọc
+      products: [],
+      loading: true,
+      error: null
     };
   },
   methods: {
-    // Phương thức thêm sản phẩm vào giỏ hàng
-    addToCart(product) {
-      this.$emit("add-to-cart", product); // Truyền sự kiện lên component cha (App.vue)
+    // Hàm định dạng giá thành VNĐ
+    formatPrice(value) {
+      return value.toLocaleString('vi-VN') + ' VNĐ';
     },
-
-    // Phương thức áp dụng bộ lọc
-    applyFilter(filters) {
-      this.filteredProducts = this.products.filter((product) => {
-        // Kiểm tra theo danh mục
-        const categoryMatch =
-          !filters.category || product.category === filters.category;
-
-        // Kiểm tra theo giá
-        const priceMatch =
-          !filters.price ||
-          (filters.price === "0-1000000" && product.price < 1000000) ||
-          (filters.price === "1000000-5000000" &&
-            product.price >= 1000000 &&
-            product.price <= 5000000) ||
-          (filters.price === "5000000" && product.price > 5000000);
-
-        // Trả về true nếu cả hai điều kiện đều thỏa mãn
-        return categoryMatch && priceMatch;
-      });
-    },
+    // Hàm lấy dữ liệu sản phẩm
+    async fetchProducts() {
+      try {
+        const response = await axios.get('http://localhost:3000/item');
+        this.products = response.data;
+      } catch (err) {
+        this.error = 'Không thể tải dữ liệu sản phẩm.';
+        console.error(err);
+      } finally {
+        this.loading = false;
+      }
+    }
   },
+  created() {
+    this.fetchProducts();
+  }
 };
 </script>
 
 <style scoped>
-.product-list-page {
-  padding: 16px;
+.product-list {
+  padding: 20px;
   text-align: center;
-  font-family: 'Roboto', sans-serif;
 }
 
-h1 {
-  font-size: 2rem;
-  color: #2c3e50;
-  margin-bottom: 20px;
-  font-weight: 700;
+.error {
+  color: red;
+  font-weight: bold;
 }
 
 .products {
-  display: grid;
-  gap: 16px;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  padding-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-/* Điều chỉnh cho các màn hình nhỏ hơn */
-@media (max-width: 768px) {
-  .products {
-    grid-template-columns: 1fr 1fr; /* 2 cột trên màn hình nhỏ */
-  }
+.product-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  width: 250px;
+  margin: 10px;
+  padding: 15px;
+  box-shadow: 2px 2px 12px rgba(0,0,0,0.1);
+}
+
+.product-image {
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+h2 {
+  font-size: 1.2em;
+  margin: 10px 0;
+}
+
+p {
+  font-size: 0.9em;
+  color: #555;
 }
 </style>

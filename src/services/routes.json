@@ -1,0 +1,10 @@
+{
+    "/smartwatches": "/items?category=Đồng hồ thông minh",
+    "/luxury-watches": "/items?category=Đồng hồ cao cấp",
+    "/accessories": "/items?category=Phụ kiện",
+    "/sports-watches": "/items?category=Đồng hồ thể thao",
+    "/fashion-watches": "/items?category=Đồng hồ thời trang",
+    "/new-products": "/items?_sort=createdAt&_order=desc&_limit=10",
+    "/all-products": "/items"
+  }
+  

@@ -14,19 +14,19 @@
         <h4 class="footer__subtitle">Liên kết nhanh</h4>
         <ul class="footer__links">
           <li class="footer__link-item">
-            <a @click.prevent="$emit('navigate', 'home')" href="#" class="footer__link">Trang chủ</a>
+            <a @click.prevent="navigate('home')" href="#" class="footer__link">Trang chủ</a>
           </li>
           <li class="footer__link-item">
-            <a @click.prevent="$emit('navigate', 'about')" href="#" class="footer__link">Về chúng tôi</a>
+            <a @click.prevent="navigate('about')" href="#" class="footer__link">Về chúng tôi</a>
           </li>
           <li class="footer__link-item">
-            <a @click.prevent="$emit('navigate', 'contact')" href="#" class="footer__link">Liên hệ</a>
+            <a @click.prevent="navigate('contact')" href="#" class="footer__link">Liên hệ</a>
           </li>
           <li class="footer__link-item">
-            <a @click.prevent="$emit('navigate', 'policy')" href="#" class="footer__link">Chính sách bảo mật</a>
+            <a @click.prevent="navigate('policy')" href="#" class="footer__link">Chính sách bảo mật</a>
           </li>
           <li class="footer__link-item">
-            <a @click.prevent="$emit('navigate', 'terms')" href="#" class="footer__link">Điều khoản sử dụng</a>
+            <a @click.prevent="navigate('terms')" href="#" class="footer__link">Điều khoản sử dụng</a>
           </li>
         </ul>
       </div>
@@ -45,7 +45,7 @@
           </li>
           <li class="footer__contact-item">
             <i class="fas fa-map-marker-alt footer__contact-icon"></i>
-            <span style="">371 Nguyễn Kiệm, Trường Đại Học Gia Định, Gò Vấp, TP. HCM</span>
+            <span>371 Nguyễn Kiệm, Trường Đại Học Gia Định, Gò Vấp, TP. HCM</span>
           </li>
         </ul>
       </div>
@@ -80,12 +80,16 @@
 <script>
 export default {
   name: "ComFooter",
+  methods: {
+    navigate(route) {
+      this.$router.push({ name: route });
+    },
+  },
 };
 </script>
 
-<style scoped>
+<style>
 /* CSS Variables for Consistent Styling */
-
 :root {
   --primary-color: #003366;
   --secondary-color: #ffcc00;
@@ -159,6 +163,7 @@ export default {
 .footer__links {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .footer__link-item {
@@ -168,6 +173,7 @@ export default {
 .footer__contact-list {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
 .footer__contact-item {
